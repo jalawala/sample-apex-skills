@@ -15,6 +15,7 @@ The 8 negative prompts in `triggering.json` (entries 9–16, 0-indexed 8–15) a
 - **`eks-operation-review`** (operational excellence audit with GREEN/AMBER/RED) — negative 13 ("audit operational posture and rate each area").
 - **`eks-mcp-server`** (installing / wiring the EKS MCP server itself) — negative 14 ("install the EKS MCP server and connect it to my AI assistant").
 - **Generic / unrelated** (pure Kubernetes concepts, or standalone Terraform that belongs to `terraform-skill`) — negatives 15, 16 ("StatefulSet rolling updates at the controller level", "standalone Terraform module with native tests for an S3 bucket").
+- **`eks-genai`** (self-hosted GenAI / LLM workloads on EKS (GPU/Neuron, vLLM/Ray, training, gateway)) — negative 17 ("What GPU instance, inference engine, an…").
 <!-- SIBLING_MAP_END -->
 
 The key discriminator: the prompt asks how to build or operate a *platform* that app/ML/data teams self-serve from — portal, templates, golden paths, GitOps delivery, promotion, self-service provisioning, or platform success metrics — not a cluster-level design decision, a discovery scan, an upgrade score, an ops audit, MCP setup, or standalone IaC.
