@@ -1,6 +1,8 @@
 # APEX Skills — Agentic Platform Engineering eXperience
 
-> Curated EKS platform engineering skills that compress onboarding from months to weeks. Domain knowledge authored by senior AWS SSAs, delivered through agentic AI tools (Claude Code, Kiro CLI etc).
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://aws-samples.github.io/sample-apex-skills/)
+
+> Curated platform-engineering skills that compress onboarding from months to weeks. Domain knowledge authored by senior AWS SSAs, TAMs, and ProServe, delivered through agentic AI tools (Claude Code, Kiro CLI etc).
 
 **APEX** uses agentic AI (frontier models and agent harness like Claude Code) combined with curated "skills" to give engineers SSA-grade platform engineering output.
 
@@ -12,7 +14,7 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 
 ```
 sample-apex-skills/
-├── skills/       → 📚 Domain knowledge (EKS best practices, Terraform, skill creation)
+├── skills/       → 📚 Domain knowledge (platform-engineering best practices, Terraform, skill creation)
 ├── steering/     → 🎯 Guided workflows (optional — structured engagement playbooks)
 ├── examples/     → 🏗️ Hands-on exercises (deployable labs with planted issues)
 └── misc/         → 🔧 Maintenance and tooling
@@ -71,7 +73,7 @@ ln -sfn "$(pwd)/steering" ~/.claude/apex-steering
 2. Use slash commands:
    - `/apex:eks` — hub that auto-routes based on your request
    - `/apex:eks-design` — *"Help me design an EKS cluster"*
-   - `/apex:eks-upgrade` — *"Upgrade my cluster from 1.30 to 1.33"*
+   - `/apex:eks-upgrade-check` — *"Is my cluster ready to upgrade to 1.32?"*
 
 #### Kiro CLI
 
@@ -118,6 +120,7 @@ kiro-cli chat
 | **[skill-creator](skills/skill-creator/)** | Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy. |
 | **[steering-workflow-creator](skills/steering-workflow-creator/)** | Author a new steering workflow for any AWS service and pair it with a matching slash-command shim. Use when the user asks to create a steering workflow, add a workflow to apex, standardize steering, write a new workflow for EKS / RDS / Lambda / IAM / any AWS service, or build a phased playbook that plugs into a service hub. Covers the convention (frontmatter, header block, required sections), tool routing (knowledge vs. live MCP vs. setup-bridge), and the lint pass before handoff. |
 | **[terraform-skill](skills/terraform-skill/)** | Use when working with Terraform or OpenTofu - creating modules, writing tests (native test framework, Terratest), setting up CI/CD pipelines, reviewing configurations, choosing between testing approaches, debugging state issues, implementing security scanning (trivy, checkov), or making infrastructure-as-code architecture decisions |
+| **[update-docs](skills/update-docs/)** | Audit and update every documentation surface in the APEX repo against the current state of skills, steering workflows, README marker tables, and the Docusaurus site under misc/website/. After any change to a skill (rename, retire, add, edit description), walk the repo, re-run script-managed surfaces if their --check fails, and reason through every tracked prose *.md to catch references that need updating. Use after adding/removing/renaming a skill, after editing SKILL.md frontmatter, after editing README marker blocks, or before publishing a docs change. Also use when the user says "update docs", "sync docs", "check docs", "run update-docs", or mentions that documentation might be stale. |
 <!-- SKILLS_REFERENCE_END -->
 
 ---

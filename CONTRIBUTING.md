@@ -1,4 +1,4 @@
-# Contributing to APEX EKS  
+# Contributing to APEX
 
 This guide explains how the repository is organized, where new content should go, and the process for submitting contributions.
 
@@ -6,10 +6,10 @@ This guide explains how the repository is organized, where new content should go
 
 ## Repository Architecture
 
-APEX EKS organizes content into three directories, each serving a distinct purpose in the agentic workflow. Understanding the distinction is critical — putting content in the wrong place degrades the agent's performance.
+APEX organizes content into three directories, each serving a distinct purpose in the agentic workflow. Understanding the distinction is critical — putting content in the wrong place degrades the agent's performance.
 
 ```
-apex-eks/
+sample-apex-skills/
 ├── steering/           → 🎯 HOW the agent behaves (conversation orchestration)
 │   ├── commands/       →   Slash command definitions (harness-specific entry points)
 │   └── workflows/      →   Structured engagement playbooks
@@ -92,11 +92,19 @@ steering/
 ├── commands/                 # Slash command wrappers (harness-specific entry points)
 │   └── apex/                 # Claude Code: symlinked into .claude/commands/apex/
 │       ├── eks.md            # /apex:eks → routes via steering/eks.md
+│       ├── eks-best-practices.md  # /apex:eks-best-practices → best practices guidance
+│       ├── eks-build.md      # /apex:eks-build → steering/workflows/eks-build.md
 │       ├── eks-design.md     # /apex:eks-design → steering/workflows/design.md
+│       ├── eks-operation-review.md  # /apex:eks-operation-review → operational review
+│       ├── eks-platform-engineering.md  # /apex:eks-platform-engineering → platform design
+│       ├── eks-upgrade-check.md  # /apex:eks-upgrade-check → upgrade readiness check
 │       └── new-skill.md      # /apex:new-skill → steering/workflows/new-skill.md
 └── workflows/
     ├── design.md             # Day 0: Architecture questionnaire + quality check
-    ├── upgrade.md            # Day 2: Pre-flight → plan → execute → validate
+    ├── eks-build.md          # Day 1: Cluster build and provisioning
+    ├── eks-operation-review.md  # Day 2: Operational health review
+    ├── eks-platform-engineering.md  # Day 2: Platform engineering assessment
+    ├── eks-upgrade-check.md  # Day 2: Pre-flight → plan → execute → validate
     └── new-skill.md          # Meta: onboard a new skill end-to-end
 ```
 
@@ -300,6 +308,10 @@ Each item is something `/apex:new-skill` will have produced by the end of Phase 
 - [ ] `make init-evals-finalize SKILL=<name>` exits 0
 - [ ] `make check-evals-coverage` exits 0
 - [ ] Catalogue entries landed: `skills/README.md`, `CONTRIBUTING.md`, and (if service-scoped) the relevant service hub
+
+### Keeping skill docs in sync after changes
+
+Adding, renaming, or removing a skill — or editing a SKILL.md frontmatter description — should be followed by running the `update-docs` skill so wrappers, marker blocks, and prose references stay in sync. The skill walks both script-managed surfaces (`update-all-references.sh`, `update-pages.sh`) and hand-written prose, proposing diffs for anything stale.
 
 ## Creating a New Steering Workflow
 

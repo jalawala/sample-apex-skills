@@ -25,7 +25,7 @@ This workflow uses the `eks-build` skill for code generation and the `eks-best-p
 
 ---
 
-# Build Questionnaire
+## Build Questionnaire
 
 Use this questionnaire when generating a new EKS infrastructure project. Walk through the phases to gather requirements, confirm the summary, then generate.
 
