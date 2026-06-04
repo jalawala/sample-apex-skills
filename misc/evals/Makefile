@@ -1,4 +1,4 @@
-# misc/evals/Makefile — drives skill-creator eval machinery for the 4 in-scope skills.
+# misc/evals/Makefile — drives skill-creator eval machinery for all maintained skills.
 #
 # All module-mode scripts require cwd = skills/skill-creator/ (scripts/ is a Python
 # package with an empty __init__.py, so `python3 -m scripts.<name>` is mandatory).
@@ -27,7 +27,7 @@ SC_DIR         := $(REPO_ROOT)/skills/skill-creator
 #                          inference-profile ID. Required on AWS-only setups.
 #   anthropic            — uses the Anthropic API. Expects ANTHROPIC_API_KEY
 #                          to be exported in the caller's environment.
-# Override per invocation: `make score PROVIDER=anthropic MODEL=claude-opus-4-6-v1`.
+# Override per invocation: `make triggering-all PROVIDER=anthropic MODEL=claude-opus-4-6-v1`.
 # Defaults for MODEL are provider-aware; explicit MODEL= always wins.
 PROVIDER       ?= bedrock
 
@@ -42,6 +42,7 @@ endif
 
 NUM_WORKERS    ?= 10
 RUNS_PER_QUERY ?= 3
+THRESHOLD      ?= 5
 
 # Per-skill default locations (override with WORKSPACE=… / BENCHMARK_DIR=…)
 workspace_dir   = $(EVALS_ROOT)/$(1)/workspace
@@ -68,27 +69,35 @@ KUBECONFIG_RO     ?= $(READONLY_SECRETS)/kubeconfig.readonly
 AWS_POLICY_RO     ?= $(READONLY_SECRETS)/readonly-session-policy.json
 AWS_REGION        ?= us-west-2
 
-.PHONY: help list-skills validate-all triggering-all task-all score-full \
+PROCESS_T    := $(addprefix process-,$(SKILLS))
+ARTIFACT_T   := $(addprefix artifact-,$(SKILLS))
+KNOWLEDGE_T  := $(addprefix knowledge-,$(SKILLS))
+SNAPSHOT_T   := $(addprefix snapshot-,$(SKILLS))
+REGRESSION_T := $(addprefix regression-,$(SKILLS))
+COMPOSITE_T  := $(addprefix composite-,$(SKILLS))
+
+.PHONY: help list-skills validate-all triggering-all task-all task-all-parallel \
         init-evals init-evals-finalize check-evals-coverage hygiene \
-        score score-dry \
+        process-all artifact-all knowledge-all composite-all \
         $(VALIDATE_T) $(TRIGGERING_T) \
-        $(BENCHMARK_T) $(REPORT_T) $(PACKAGE_T) $(REVIEW_T) $(TASK_T)
+        $(BENCHMARK_T) $(REPORT_T) $(PACKAGE_T) $(REVIEW_T) $(TASK_T) $(PROCESS_T) $(ARTIFACT_T) $(KNOWLEDGE_T) $(COMPOSITE_T)
 
 help:
 	@echo "Per-skill targets (SKILL in: $(SKILLS)):"
 	@echo "  validate-<skill>    A  quick_validate.py          (deterministic)"
 	@echo "  triggering-<skill>  B  run_triggering.py            (LIVE — needs claude -p)"
+	@echo "  process-<skill>     C  process_assertions.py       (deterministic — runs against latest events.jsonl)"
+	@echo "  artifact-<skill>    D  artifact_validation.py       (deterministic — validates outputs/ files)"
 	@echo "  benchmark-<skill>   E  aggregate_benchmark.py      (deterministic)"
 	@echo "  report-<skill>      F  generate_report.py          (deterministic)"
 	@echo "  package-<skill>     G  package_skill.py            (deterministic)"
 	@echo "  review-<skill>      K  eval-viewer/generate_review --static  (deterministic)"
 	@echo "  task-<skill>        H  run_task_evals.py           (LIVE — subject + grader)"
 	@echo ""
+	@echo "  composite-<skill>  I  composite_score.py          (deterministic — weighted score + grade)"
+	@echo ""
 	@echo "Meta targets:"
-	@echo "  validate-all, triggering-all, task-all"
-	@echo "  score               run triggering for every skill and rewrite README scorecard"
-	@echo "  score-dry           render the scorecard to stdout without editing README"
-	@echo "  score-full          task-all + score (full task + triggering refresh)"
+	@echo "  validate-all, triggering-all, process-all, artifact-all, composite-all, task-all"
 	@echo ""
 	@echo "New-skill onboarding:"
 	@echo "  init-evals SKILL=<name> [SIBLINGS=\"a,b,c\"]   scaffold misc/evals/<name>/ from _template/"
@@ -259,22 +268,89 @@ $(TASK_T): task-%:
 
 task-all: $(TASK_T)
 
-score-full: task-all score
+task-all-parallel:
+	$(MAKE) -j10 $(TASK_T)
 
-# ---------- score (Phase 1 — triggering scorecard) ----------------------------
-# Runs triggering evals for every skill, enriches the metrics, appends a row
-# to misc/evals/history/<skill>.jsonl (committed), and rewrites the scorecard
-# between <!-- SCORECARD_START/END --> in misc/evals/README.md.
-#
-# No flag-forwarding here: the Python runner has no own defaults for model /
-# runs-per-query / num-workers and only shells out to `make triggering-<skill>`
-# with those overrides when the user passed them on its own CLI. The Makefile
-# is the single source of truth for defaults — including PROVIDER / MODEL.
-score:
-	python3 $(EVALS_ROOT)/scripts/run_all_evals.py
+# ---------- C  process assertions (deterministic; replay against existing runs) -
+# Runs process_assertions.py against the latest events.jsonl files for a skill.
+# No model calls — purely deterministic. Reads assertions from evals.json
+# process_assertions field; evaluates against workspace/latest/ run data.
+$(PROCESS_T): process-%:
+	@test -f $(call evals_json,$*) || \
+	  { echo "missing: $(call evals_json,$*)"; exit 1; }
+	python3 $(EVALS_ROOT)/scripts/run_process_assertions.py \
+	  --skill $*
 
-score-dry:
-	python3 $(EVALS_ROOT)/scripts/run_all_evals.py --dry-run
+process-all: $(PROCESS_T)
+
+# ---------- D  artifact validation (deterministic; validates outputs/ files) --
+# Runs artifact_validation.py against the latest outputs/ directories for a skill.
+# No model calls — purely deterministic. Reads assertions from evals.json
+# artifact_assertions field; evaluates against workspace/latest/ run data.
+$(ARTIFACT_T): artifact-%:
+	@test -f $(call evals_json,$*) || \
+	  { echo "missing: $(call evals_json,$*)"; exit 1; }
+	python3 $(EVALS_ROOT)/scripts/run_artifact_validation.py \
+	  --skill $*
+
+artifact-all: $(ARTIFACT_T)
+
+# ---------- E  knowledge assertions (deterministic; checks text output) -------
+# Runs knowledge_assertions.py against the latest events.jsonl files for a skill.
+# No model calls — purely deterministic. Reads assertions from evals.json
+# knowledge_assertions field; evaluates against workspace/latest/ run data.
+$(KNOWLEDGE_T): knowledge-%:
+	@test -f $(call evals_json,$*) || \
+	  { echo "missing: $(call evals_json,$*)"; exit 1; }
+	python3 $(EVALS_ROOT)/scripts/run_knowledge_assertions.py \
+	  --skill $*
+
+knowledge-all: $(KNOWLEDGE_T)
+
+# ---------- snapshot (freeze current workspace scores into baselines/) --------
+# No model calls — reads from workspace/latest/ and workspace/runs/.
+# Usage: make snapshot SKILL=eks-best-practices
+#        make snapshot-eks-best-practices
+#        make snapshot-all
+snapshot:
+	@if [ -z "$(SKILL)" ]; then \
+	  echo "usage: make snapshot SKILL=<skill-name>"; exit 1; fi
+	python3 $(EVALS_ROOT)/scripts/snapshot.py --skill $(SKILL)
+
+$(SNAPSHOT_T): snapshot-%:
+	python3 $(EVALS_ROOT)/scripts/snapshot.py --skill $*
+
+snapshot-all: $(SNAPSHOT_T)
+
+# ---------- regression (compare baseline vs current, gate on threshold) -------
+# No model calls — deterministic comparison. Exits 2 on regression.
+# Usage: make regression SKILL=eks-best-practices [THRESHOLD=5]
+#        make regression-eks-best-practices
+#        make regression-all
+regression:
+	@if [ -z "$(SKILL)" ]; then \
+	  echo "usage: make regression SKILL=<skill-name> [THRESHOLD=5]"; exit 1; fi
+	python3 $(EVALS_ROOT)/scripts/regression.py --skill $(SKILL) --threshold $(THRESHOLD)
+
+$(REGRESSION_T): regression-%:
+	python3 $(EVALS_ROOT)/scripts/regression.py --skill $* --threshold $(THRESHOLD)
+
+regression-all: $(REGRESSION_T)
+
+# ---------- composite score (deterministic; reads workspace + .skilleval.yaml) -
+# Computes weighted composite score from all available layers. No model calls.
+# Usage: make composite SKILL=eks-best-practices
+#        make composite-eks-best-practices
+#        make composite-all
+composite:
+	@if [ -z "$(SKILL)" ]; then \
+	  echo "usage: make composite SKILL=<skill-name>"; exit 1; fi
+	python3 $(EVALS_ROOT)/scripts/composite_score.py --skill $(SKILL)
+
+$(COMPOSITE_T): composite-%:
+	python3 $(EVALS_ROOT)/scripts/composite_score.py --skill $*
+
+composite-all: $(COMPOSITE_T)
 
 # ---------- hygiene (deterministic pre-flight; no model, no cluster) ----------
 # Runs quick_validate + schema checks (triggering.json positives/negatives,
@@ -298,3 +374,7 @@ check-evals-coverage:
 	   exit 1; \
 	 fi; \
 	 echo "✓ All skills have misc/evals/ entries"
+
+# ---------- eval-manifest (deterministic; generates website manifest) ---------
+eval-manifest:
+	python3 $(EVALS_ROOT)/scripts/generate_eval_manifest.py

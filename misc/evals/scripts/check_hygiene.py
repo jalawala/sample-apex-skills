@@ -156,6 +156,106 @@ def main() -> int:
                         f"evals.json prompt id={p.get('id', '?')} references file '{f}' but {file_path} does not exist"
                     )
 
+        # 5. artifact_assertions schema validation (if present).
+        VALID_STRUCTURAL_TYPES = {
+            "file-exists", "file-not-exists", "contains", "not-contains",
+            "yaml-valid", "json-valid", "file-count", "hcl-resource-exists",
+            "json-schema", "mermaid-valid",
+        }
+        VALID_VALIDATOR_TYPES = {
+            "terraform-fmt", "terraform-validate", "checkov", "shellcheck",
+            "markdownlint", "kubectl-dry-run", "script",
+        }
+        for p in prompts:
+            aa = p.get("artifact_assertions")
+            if not aa:
+                continue
+            pid = p.get("id", "?")
+            if not isinstance(aa, dict):
+                warnings.append(f"evals.json prompt id={pid}: artifact_assertions must be a dict")
+                continue
+            for key in aa:
+                if key not in ("root_glob", "validators", "structural"):
+                    warnings.append(f"evals.json prompt id={pid}: unknown artifact_assertions key '{key}'")
+            for i, s in enumerate(aa.get("structural") or []):
+                stype = s.get("type")
+                if stype not in VALID_STRUCTURAL_TYPES:
+                    warnings.append(
+                        f"evals.json prompt id={pid}: structural[{i}] has unknown type '{stype}'"
+                    )
+            for i, v in enumerate(aa.get("validators") or []):
+                vtype = v.get("type")
+                if vtype not in VALID_VALIDATOR_TYPES:
+                    warnings.append(
+                        f"evals.json prompt id={pid}: validators[{i}] has unknown type '{vtype}'"
+                    )
+                if vtype == "script" and "path" not in v:
+                    warnings.append(
+                        f"evals.json prompt id={pid}: validators[{i}] type=script requires 'path'"
+                    )
+
+        # 6. .skilleval.yaml presence and basic structure.
+        skilleval_path = rae.EVALS_ROOT / skill / ".skilleval.yaml"
+        if not skilleval_path.exists():
+            warnings.append(f"missing .skilleval.yaml at {skilleval_path}")
+        else:
+            try:
+                import yaml
+                skilleval_raw = yaml.safe_load(skilleval_path.read_text()) or {}
+                if not isinstance(skilleval_raw, dict):
+                    warnings.append(".skilleval.yaml must be a YAML mapping")
+                else:
+                    if "skill_name" not in skilleval_raw:
+                        warnings.append(".skilleval.yaml missing 'skill_name' field")
+                    elif skilleval_raw["skill_name"] != skill:
+                        warnings.append(
+                            f".skilleval.yaml skill_name '{skilleval_raw['skill_name']}' "
+                            f"does not match directory name '{skill}'"
+                        )
+                    if "weights" not in skilleval_raw:
+                        warnings.append(".skilleval.yaml missing 'weights' field")
+                    elif isinstance(skilleval_raw["weights"], dict):
+                        wsum = sum(float(v) for v in skilleval_raw["weights"].values())
+                        if abs(wsum - 1.0) > 0.01:
+                            warnings.append(
+                                f".skilleval.yaml weights sum to {wsum:.3f} (expected ~1.0)"
+                            )
+            except ImportError:
+                pass  # PyYAML not available — skip validation
+            except Exception as e:
+                warnings.append(f".skilleval.yaml parse error: {e}")
+
+        # 7. knowledge_assertions schema validation (if present).
+        VALID_KNOWLEDGE_TYPES = {
+            "must-contain", "must-not-contain", "must-contain-one-of", "regex-match",
+        }
+        for p in prompts:
+            ka = p.get("knowledge_assertions")
+            if not ka:
+                continue
+            pid = p.get("id", "?")
+            if not isinstance(ka, list):
+                warnings.append(f"evals.json prompt id={pid}: knowledge_assertions must be a list")
+                continue
+            for i, a in enumerate(ka):
+                atype = a.get("type")
+                if atype not in VALID_KNOWLEDGE_TYPES:
+                    warnings.append(
+                        f"evals.json prompt id={pid}: knowledge_assertions[{i}] has unknown type '{atype}'"
+                    )
+                if not a.get("source"):
+                    warnings.append(
+                        f"evals.json prompt id={pid}: knowledge_assertions[{i}] missing required 'source' field"
+                    )
+                if atype in ("must-contain", "must-not-contain", "regex-match") and not a.get("pattern"):
+                    warnings.append(
+                        f"evals.json prompt id={pid}: knowledge_assertions[{i}] type={atype} requires 'pattern'"
+                    )
+                if atype == "must-contain-one-of" and not isinstance(a.get("patterns"), list):
+                    warnings.append(
+                        f"evals.json prompt id={pid}: knowledge_assertions[{i}] type={atype} requires 'patterns' list"
+                    )
+
         if warnings:
             any_fail = True
             print(f"✗ {skill}")
