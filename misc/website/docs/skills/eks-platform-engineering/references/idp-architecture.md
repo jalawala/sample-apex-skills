@@ -74,6 +74,8 @@ Analogy: a train-station platform. The platform adds value only when people acti
 - **Why hub-and-spoke:** centralizes control-plane operations, isolates workloads, and lets new spokes self-register and inherit the full add-on set via GitOps.
 - **EKS Auto Mode** is the default cluster type for both hub and spokes so the platform team does not manage nodes, scaling, or patching.
 
+> **Git provider is interchangeable.** This reference uses **GitLab** as the source + base-CI system because that is what the underlying workshop deploys, but nothing in the architecture depends on it. **GitHub** (with GitHub Actions or Argo Workflows), or any Git provider with webhooks, works identically — the platform contract is "a Git repo that triggers CI and that ArgoCD reconciles from." Swap the provider without changing the GitOps, promotion, or golden-path design.
+
 ## The GitOps Bridge pattern
 
 The "GitOps Bridge" passes infrastructure metadata (cluster name, region, IAM role ARNs, VPC IDs, OIDC provider, add-on config) from the IaC/provisioning layer into the cluster as Kubernetes secrets/labels that ArgoCD ApplicationSets read. This decouples "how the cluster was built" from "what gets deployed onto it" — the same GitOps definitions target any registered cluster because the bridge supplies the per-cluster specifics.
@@ -89,17 +91,17 @@ Practically:
 |---------|------|
 | Front door / catalog / templates | Backstage |
 | Identity / SSO | Keycloak |
-| Source + base CI | GitLab |
+| Source + base CI | GitLab (or GitHub / any webhook-capable Git provider) |
 | GitOps reconciliation | ArgoCD |
 | CI orchestration | Argo Workflows + Argo Events |
 | Progressive delivery | Argo Rollouts |
 | Multi-stage promotion | Kargo |
 | AWS resources as CRDs | ACK |
 | Resource composition (custom CRDs) | kro |
-| App abstraction | KubeVela / OAM |
+| App abstraction | Backstage templates + kro (default); KubeVela / OAM (alternative) |
 | Secrets sync | External Secrets Operator |
-| Workload IAM | EKS Pod Identity / IRSA |
+| Workload IAM | EKS Pod Identity (recommended for new workloads) / IRSA |
 | Metrics / dashboards / DORA | Prometheus, Grafana, Apache DevLake |
-| GenAI assistance | Amazon Q Developer |
+| GenAI assistance | Kiro (successor to Amazon Q Developer) |
 
 See the matching references for each layer's depth.

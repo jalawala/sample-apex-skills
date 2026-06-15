@@ -12,6 +12,8 @@ ML delivery has hard problems (data lineage, reproducibility, large images, GPU 
 
 AI/ML container images are large (Jupyter 4GB+, framework images 3GB+), so cold starts are painful. The platform runs a **DaemonSet that pre-pulls these images to nodes in the background**, so notebooks/serving pods start near-instantly. This is an opinionated platform-level solution to a problem every ML team would otherwise hit independently.
 
+> **Caveat on EKS Auto Mode / aggressive autoscaling.** A pre-pull DaemonSet assumes relatively stable nodes. On EKS Auto Mode (and aggressive Karpenter consolidation) nodes are launched and recycled frequently, so the DaemonSet may not finish pulling before a pod lands on a fresh node — and you re-pay the pull on every churn. On those node types, pair or replace the DaemonSet with a node-lifecycle-aware approach: bake hot images into a custom AMI, use a warm pool / pre-provisioned capacity, an `initContainer` that gates startup on image availability, or an **ECR pull-through cache** to shorten pulls. Validate against your actual node churn before relying on it.
+
 ## Golden path: model development — JupyterHub
 
 JupyterHub provides multi-user, self-service notebooks on Kubernetes. Components: Hub (auth/management), Proxy (routing), and per-user notebook servers.
@@ -31,16 +33,18 @@ Backstage "Ray Service" template → Git repo (manifests) → ArgoCD → Ray Ser
 - Auto-scaling, multi-framework, zero-downtime updates, operator-managed — the model is replaceable with the team's own.
 - Test the endpoint with a simple `curl` POST to `/generate`.
 
-## Golden path: data engineering — Spark Operator
+## Golden path: data engineering — Kubeflow Spark Operator
 
-Spark-on-Kubernetes via the Spark Operator, jobs expressed as `SparkApplication` CRDs and orchestrated by Argo Workflows.
+Spark-on-Kubernetes via the **Kubeflow Spark Operator** (`kubeflow/spark-operator` — formerly `GoogleCloudPlatform/spark-on-k8s-operator`, donated to the Kubeflow project), jobs expressed as `SparkApplication` CRDs (`sparkoperator.k8s.io` API group) and orchestrated by Argo Workflows.
 
 ```
-Backstage "Spark job" template → Git repo (manifests) → ArgoCD → Argo Workflows → Spark Operator → SparkApplication → driver/executor pods
+Backstage "Spark job" template → Git repo (manifests) → ArgoCD → Argo Workflows → Kubeflow Spark Operator → SparkApplication → driver/executor pods
 ```
 - Data engineer supplies: app name + the `mainApplicationFile` (the PySpark script). Platform supplies: Spark infra, workflow orchestration, and observability (Backstage Spark tab + Argo Workflows UI).
 - `kubectl get sparkapplications.sparkoperator.k8s.io -A` to inspect runs.
 
+> **Operator choice.** `kubeflow/spark-operator` is the established CRD-based operator and what this platform uses. The Apache Spark project has since started its own first-party operator (`apache/spark-kubernetes-operator`, early/0.x as of 2026) — worth tracking as it matures, but the Kubeflow operator remains the production-proven default today.
+
 ## The throughline
 
-ML serving, data jobs, and apps all follow the identical loop — a Backstage template generates a Git repo, ArgoCD deploys it, and a controller (Ray/Spark Operator, or KubeVela for apps) reconciles it. One platform, one delivery model, three audiences. That uniformity is the payoff: the platform team maintains one set of paved paths; ML and data teams self-serve exactly like app teams.
+ML serving, data jobs, and apps all follow the identical loop — a Backstage template generates a Git repo, ArgoCD deploys it, and a controller (Ray / Kubeflow Spark Operator, or the app abstraction — kro or KubeVela — for apps) reconciles it. One platform, one delivery model, three audiences. That uniformity is the payoff: the platform team maintains one set of paved paths; ML and data teams self-serve exactly like app teams.

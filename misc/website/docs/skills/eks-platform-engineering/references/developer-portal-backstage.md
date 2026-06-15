@@ -60,4 +60,4 @@ Once registered, a component's catalog page links its source repo, its ArgoCD ap
 
 ## Generating templates with GenAI
 
-Amazon Q Developer can scaffold a whole new template from an existing one (e.g. "use the S3 template to make a DynamoDB template"). Pattern: point Q at a reference template + the target resource's OAM/CRD schema, generate, then `diff` against a validated version before registering. See `genai-platform-engineering.md`.
+**Kiro** (AWS's spec-driven agentic tool, the successor to Amazon Q Developer) can scaffold a whole new template from an existing one (e.g. "use the S3 template to make a DynamoDB template"). Pattern: point the agent at a reference template + the target resource's CRD/composition schema, generate, then `diff` against a validated version before registering. See `genai-platform-engineering.md`.

@@ -43,9 +43,9 @@ Two workflows typically run: a one-time `*-setup-workflow` (cache warming / prov
 
 The developer provides only:
 1. A **`Dockerfile`** in the repo (the platform expects nothing else for build — multi-stage builds, static linking, non-root, minimal base images are the recommended convention).
-2. An **OAM `Application` manifest** in `deployment/dev/` describing what to run (see `application-model-oam.md`).
+2. The platform's **application manifest** in `deployment/dev/` describing what to run — a kro-rendered custom resource on the default stack, or an **OAM `Application`** if you run the KubeVela abstraction (see `application-model-oam.md`). The examples below use the OAM form.
 
-Then: `git push` → Argo Workflows builds and pushes the image and bumps the manifest → ArgoCD syncs → KubeVela renders the app + its DynamoDB/IAM/ingress. "Deploying" is just pushing to Git.
+Then: `git push` → Argo Workflows builds and pushes the image and bumps the manifest → ArgoCD syncs → the app abstraction (kro composition or KubeVela) renders the app + its DynamoDB/IAM/ingress. "Deploying" is just pushing to Git.
 
 ## Verifying
 

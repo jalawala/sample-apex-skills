@@ -9,7 +9,7 @@ Every golden path is a contract: a small, stable set of things the developer pro
 | Developer provides | Platform handles |
 |--------------------|------------------|
 | A `Dockerfile` | Image build, push to ECR, caching, scanning |
-| An OAM `Application` manifest (intent) | CI/CD pipeline, GitOps wiring |
+| The app manifest (intent) — a kro custom resource on the default stack, or an OAM `Application` on KubeVela | CI/CD pipeline, GitOps wiring |
 | Form parameters (name, region, size, …) | Infra provisioning (ACK/kro), networking (ingress/DNS) |
 | `git push` | Security (IAM/Pod Identity), progressive delivery, rollback |
 | Gate thresholds / metrics (optional) | Promotion (Kargo), observability, DORA metrics |

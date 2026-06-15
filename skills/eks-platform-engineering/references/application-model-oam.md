@@ -1,6 +1,17 @@
-# Application Model — OAM / KubeVela
+# Application Model — the developer-facing app abstraction
 
 The abstraction that lets developers describe an application — and its infrastructure dependencies — in one declarative file, without writing Deployments, Services, Ingresses, IAM, or ACK manifests directly.
+
+## Choosing the abstraction (read first)
+
+There are two supported ways to provide this layer; pick one and standardize on it.
+
+- **Default — Backstage software templates + kro.** A Backstage template gathers parameters; a platform-authored kro `ResourceGraphDefinition` composes the workload and its dependencies into one custom resource. This keeps the platform on a **single composition engine** — the same kro used for environment and resource provisioning — which is the main reason it's the default. (kro is pre-1.0 / `v1alpha1` as of June 2026; see the maturity note in `SKILL.md`.)
+- **Alternative — OAM / KubeVela** (this document). A richer, application-centric model (Components + Traits, authored in CUE) and a **fully supported** choice. Prefer it when you specifically want the OAM `Application` abstraction and its trait system.
+
+> **Project-status note (verify before standardizing).** KubeVela is a **CNCF Incubating** project and is **not archived** — it shipped v1.10.8 (March 2026) with a v1.11 alpha in progress. However, its commit and release velocity has slowed, and the **Open Application Model spec itself has been largely dormant** (the `oam-dev/spec` repo's last release was v0.3.0 in 2021). This doesn't make KubeVela a wrong choice, but it does mean you should check current project health (commit cadence, maintainer activity, the CNCF/LFX Insights dashboard) before betting a platform on it — and it's why this skill defaults to Backstage + kro. The OAM concepts below remain a clear way to *think about* the application abstraction regardless of which engine renders it.
+
+The rest of this document describes the OAM/KubeVela model in detail.
 
 ## OAM concepts
 
@@ -63,7 +74,7 @@ Common `appmod-service` parameters: `image`, `replicas`, `port`/`targetPort`, `s
 
 ## CUE and extensibility
 
-Component/trait definitions are written in CUE (e.g. the `webservice` definition lives in KubeVela's templates). CUE is chosen over raw YAML for type-safety and composition. Platform engineers add new component/trait types without changing the core platform; developers pick them up immediately by `type`. GenAI (Amazon Q) is commonly used to author new component definitions from an existing one + a CRD schema (see `genai-platform-engineering.md`).
+Component/trait definitions are written in CUE (e.g. the `webservice` definition lives in KubeVela's templates). CUE is chosen over raw YAML for type-safety and composition. Platform engineers add new component/trait types without changing the core platform; developers pick them up immediately by `type`. GenAI (via Kiro — see `genai-platform-engineering.md`) is commonly used to author new component definitions from an existing one + a CRD schema.
 
 ## Why OAM here
 

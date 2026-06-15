@@ -23,14 +23,14 @@ Keycloak is the identity backbone. Every platform tool — Backstage, ArgoCD, Ar
 
 ## Workload identity — EKS Pod Identity / IRSA
 
-Workloads (and platform controllers like ACK) get AWS permissions without stored credentials:
+Workloads (and platform controllers like ACK) get AWS permissions without stored credentials. Per the EKS Best Practices Guide, **EKS Pod Identity is the recommended approach for new workloads**, while **IRSA remains a fully supported alternative** (not deprecated, no end-of-support) — and is the correct choice in specific scenarios:
 
 | Approach | Use when |
 |----------|----------|
-| **EKS Pod Identity** (preferred) | New workloads — simpler association, session tags, role chaining |
-| **IRSA** | Older clusters, Fargate, or where Pod Identity isn't available |
+| **EKS Pod Identity** (recommended for new workloads) | New workloads on supported node types — simpler association (no per-cluster IAM OIDC provider to manage), session tags, role chaining, native cross-account access, scales past OIDC-provider quotas; it's also the default credential mechanism on EKS Auto Mode |
+| **IRSA** (fully supported alternative) | Running on AWS Fargate or Windows nodes, or with SDKs that don't yet support Pod Identity; you already have OIDC/IRSA in place and there's no compelling reason to migrate working deployments; you need direct OIDC federation to roles in workload accounts |
 
-In the OAM model, the `dp-service-account` component creates a service account bound to a scoped IAM role and wires the Pod Identity association — so a developer requesting "access to my DynamoDB table" gets a least-privilege role automatically, never an access key. Controllers (ACK) likewise use IRSA/Pod Identity, so no AWS keys live in the cluster.
+In the platform's application abstraction, the `dp-service-account` component (a kro composition, or an OAM component on KubeVela) creates a service account bound to a scoped IAM role and wires the Pod Identity association — so a developer requesting "access to my DynamoDB table" gets a least-privilege role automatically, never an access key. Controllers (ACK) likewise use Pod Identity / IRSA, so no AWS keys live in the cluster.
 
 ## Multi-tenancy
 
