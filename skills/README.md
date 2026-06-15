@@ -114,6 +114,29 @@ Use when designing EKS architecture. Generates design documents with Mermaid dia
 
 ---
 
+### [eks-genai](./eks-genai/)
+
+Use whenever someone is building, training, fine-tuning, or serving a generative AI / LLM workload on Amazon EKS — phrased as "GPU vs Trainium/Inferentia", "vLLM on EKS", "Ray Serve / KubeRay", "distributed training on EKS", "FSx for Lustre for ML", "Karpenter for GPU", "EFA / NCCL multi-node", "DCGM / Neuron Monitor", "LiteLLM / AI gateway", "RAG on EKS", "agentic AI on EKS", or "self-host Llama / Mistral / Qwen". Walks the opinionated 6-layer stack (compute → cluster/scheduler → frameworks → storage → observability → AI gateway), the GPU-vs-Neuron decision, the JARK + vLLM + LiteLLM canonical reference, KV-cache tiering, cost levers (Neuron, Spot, Capacity Blocks), and a non-negotiable security baseline. Trigger even if "GenAI" is never said — any GPU/Neuron, inference-serving, or distributed-training decision on EKS qualifies. Skip for SageMaker-only or Bedrock-only (no self-hosting) asks, and for generic cluster design with no AI/ML workload (use eks-best-practices / eks-design).
+
+**References** (loaded on demand):
+
+| Reference | Description |
+|-----------|-------------|
+| [agentic-and-rag.md](./eks-genai/references/agentic-and-rag.md) | Agentic and rag |
+| [ai-gateway.md](./eks-genai/references/ai-gateway.md) | Ai gateway |
+| [cluster-and-scheduling.md](./eks-genai/references/cluster-and-scheduling.md) | Cluster and scheduling |
+| [compute-hardware.md](./eks-genai/references/compute-hardware.md) | Compute hardware |
+| [distributed-training.md](./eks-genai/references/distributed-training.md) | Distributed training |
+| [inference-serving.md](./eks-genai/references/inference-serving.md) | Inference serving |
+| [kv-cache-and-cost.md](./eks-genai/references/kv-cache-and-cost.md) | Kv cache and cost |
+| [observability.md](./eks-genai/references/observability.md) | Observability |
+| [reference-implementations.md](./eks-genai/references/reference-implementations.md) | Reference implementations |
+| [security-and-compliance.md](./eks-genai/references/security-and-compliance.md) | Security and compliance |
+| [storage.md](./eks-genai/references/storage.md) | Storage |
+| [use-cases.md](./eks-genai/references/use-cases.md) | Use cases |
+
+---
+
 ### [eks-ingress-migration](./eks-ingress-migration/)
 
 Assess a live EKS cluster's NGINX/Ingress estate and plan migration to Gateway API, the AWS Load Balancer Controller (ALB Ingress), or AWS Transform (ATX). Discovers ingress controllers and routes, scores migration difficulty 0–100 with a separate re-architecture gate, and generates per-cluster reports plus ready-to-apply manifests. Use when someone asks "how hard is it to move off nginx ingress?", "assess my ingress migration", "migrate nginx to ALB or Gateway API", "ingress migration audit", or "nginx ingress retirement plan". Not for upgrade readiness (eks-upgrade-check), operational audits (eks-operation-review), general cluster discovery (eks-recon), or general ingress configuration advice (eks-best-practices).
