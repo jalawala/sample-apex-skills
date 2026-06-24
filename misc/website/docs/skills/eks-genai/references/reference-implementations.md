@@ -19,43 +19,50 @@ Canonical `awslabs/ai-on-eks` blueprint catalog, current workshops, AWS Solution
 
 The [`awslabs/ai-on-eks`](https://github.com/awslabs/ai-on-eks) repository is the **TFC-endorsed** canonical reference implementation (Containers TFC + Machine Learning TFC). Point customers here as the fastest credible path from idea to production.
 
-### Infrastructure Blueprints
+> **Verify paths before quoting them to a customer.** `awslabs/ai-on-eks` reorganizes its directory layout periodically; the paths below were confirmed against the repo's `main` in June 2026. Always `git clone` and confirm the current tree (or browse the repo) before scripting against a path — treat these as a current map, not a permanent contract.
+
+### Infrastructure Blueprints (`infra/`)
+
+Each infra blueprint is a Terraform root under `infra/<name>/terraform`.
 
 | Blueprint path | What it provisions | Use when |
 |---------------|-------------------|----------|
-| `infra/jark-stack/terraform` | Full JARK dev environment — JupyterHub + Argo Workflows + Ray + Karpenter + GPU/Neuron NodePools | Greenfield; team needs experimentation + training + inference on one cluster |
-| `infra/inference-ready-cluster` | Production-ready inference cluster — vLLM, Ray-vLLM, AIBrix, Karpenter, observability | Inference-only; fastest path to serving an LLM |
-| `infra/training` | Training-optimized cluster — FSx for Lustre, Volcano/Kueue gang scheduling, EFA | Distributed training / fine-tuning workloads |
-| `infra/neuron` | Neuron-specific cluster — Inf2/Trn1 NodePools, Neuron device plugin | Neuron-first cost optimization deployments |
+| `infra/jark-stack/terraform` | Full JARK dev environment — JupyterHub + Argo + Ray + Karpenter + GPU/Neuron NodePools | Greenfield; team needs experimentation + training + inference on one cluster |
+| `infra/base/terraform` | Base EKS cluster — Karpenter, core add-ons, GPU/Neuron NodePools (the foundation the workload blueprints deploy onto) | Inference- or general-purpose cluster; layer a workload blueprint on top |
+| `infra/trainium-inferentia/terraform` | Neuron-optimized cluster — Inf2/Trn1/Trn2 NodePools, Neuron device plugin | Neuron-first / cost-optimized training or inference |
+| `infra/nvidia-dynamo`, `infra/aibrix`, `infra/nvidia-triton-server` | Serving-stack-specific infra (Dynamo disaggregated, AIBrix, Triton) | When standardizing on that specific serving stack |
 
-### Inference Blueprints
+### Inference Blueprints (`blueprints/inference/`)
 
 | Blueprint path | Stack | Use when |
 |---------------|-------|----------|
 | `blueprints/inference/vllm-rayserve-gpu` | vLLM + Ray Serve on NVIDIA GPU | Default LLM inference (Mistral/Llama/Qwen on g6/g6e) |
-| `blueprints/inference/neuron-vllm` | vLLM + neuronx-distributed-inference on Inf2/Trn1 | Neuron cost-optimized inference |
-| `blueprints/inference/nvidia-triton` | NVIDIA Triton Server + TensorRT | Multi-model, multi-framework serving |
-| `blueprints/inference/inference-charts` | Helm charts for quick model deploy (Qwen3, Mistral, etc.) | Fastest "deploy a model in 5 minutes" path |
+| `blueprints/inference/neuron/ray-vllm` | vLLM + Ray Serve on Neuron (Inf2/Trn1) | Neuron cost-optimized inference |
+| `blueprints/inference/vllm-nvidia-triton-server-gpu` | vLLM behind NVIDIA Triton Server | Multi-model / Triton-fronted serving |
+| `blueprints/inference/inference-charts` | Helm charts for quick model deploy (Llama/Mistral/Qwen, GPU + Inf2 variants) | Fastest "deploy a model" path |
+
+(Plus model-specific examples — e.g. `mistral-7b-rayserve-inf2`, `llama3-8b-instruct-rayserve-inf2`, `vllm-llama3.1-405b-trn1` — browse `blueprints/inference/` for the current list.)
 
 ### Gateway & Agentic Blueprints
 
 | Blueprint path | Stack | Use when |
 |---------------|-------|----------|
 | `blueprints/gateways/envoy-ai-gateway` | Envoy AI Gateway — header-based routing + rate limiting | L7 multi-model routing at ingress |
-| `blueprints/agentic-ai` | RAG + LangGraph + Strands (in development) | Agentic AI platform reference |
+| `blueprints/agent-sandbox` | Sandboxed agent execution environment | Agentic AI reference / isolated agent tool execution |
 
-### Training Blueprints
+### Training Blueprints (`blueprints/training/`)
 
 | Blueprint path | Stack | Use when |
 |---------------|-------|----------|
-| `blueprints/training/ray-on-eks` | Ray Train distributed training on GPU | Multi-GPU/multi-node PyTorch training via Ray |
-| `blueprints/training/pytorch-ddp-fsx` | PyTorch DDP + FSx for Lustre | Direct DDP/FSDP training with high-throughput storage |
+| `blueprints/training/raytrain-llama2-pretrain-trn1` | Ray Train pre-training on Trainium | Multi-node distributed pre-training on Neuron |
+| `blueprints/training/llama-lora-finetuning-trn1` | LoRA fine-tuning on Trainium | Parameter-efficient fine-tuning on Neuron |
+| `blueprints/training/slinky-slurm` | Slurm-on-Kubernetes (Slinky) | Teams that want a Slurm scheduler interface for training |
 
 ### How to Use the Blueprints
 
 1. **Clone the repo:** `git clone https://github.com/awslabs/ai-on-eks.git`
-2. **Pick an infra blueprint** matching your workload type (inference-ready, training, jark-stack, neuron).
-3. **Deploy with Terraform:** `cd infra/<blueprint>/terraform && terraform init && terraform apply`
+2. **Pick an infra blueprint** (`infra/base`, `infra/jark-stack`, or `infra/trainium-inferentia`) matching your workload.
+3. **Deploy with Terraform:** `cd infra/<blueprint>/terraform && terraform init && terraform apply` (or use the blueprint's `install.sh`).
 4. **Layer an inference/training blueprint** on top for the specific model/framework.
 5. **Add gateway + observability** (LiteLLM, Langfuse, kube-prometheus-stack) from the workshop patterns.
 
@@ -65,11 +72,11 @@ The infra blueprints provision the cluster, NodePools, add-ons, and IAM. The wor
 
 | Customer use case | Start with blueprint | Then add |
 |-------------------|---------------------|----------|
-| Greenfield 7B-30B LLM inference | `infra/inference-ready-cluster` | `blueprints/inference/vllm-rayserve-gpu` + LiteLLM |
-| Cost-optimized inference (Neuron) | `infra/neuron` | `blueprints/inference/neuron-vllm` |
-| Distributed training / fine-tuning | `infra/training` | Ray Train or PyTorch DDP + FSx for Lustre |
+| Greenfield 7B-30B LLM inference | `infra/base/terraform` | `blueprints/inference/vllm-rayserve-gpu` + LiteLLM |
+| Cost-optimized inference (Neuron) | `infra/trainium-inferentia/terraform` | `blueprints/inference/neuron/ray-vllm` |
+| Distributed training / fine-tuning | `infra/trainium-inferentia/terraform` | `blueprints/training/raytrain-llama2-pretrain-trn1` or `llama-lora-finetuning-trn1` |
 | Full dev + train + serve lifecycle | `infra/jark-stack/terraform` | All of the above layered on |
-| Agentic AI multi-model platform | `infra/inference-ready-cluster` | `blueprints/gateways/envoy-ai-gateway` + `blueprints/agentic-ai` + LiteLLM + Langfuse |
+| Agentic AI multi-model platform | `infra/base/terraform` | `blueprints/gateways/envoy-ai-gateway` + `blueprints/agent-sandbox` + LiteLLM + Langfuse |
 | Hybrid Trainium training + GPU inference | `infra/jark-stack/terraform` | Neuron NodePool (training) + GPU NodePool (inference) via Karpenter |
 
 ---

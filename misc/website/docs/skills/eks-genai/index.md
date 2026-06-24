@@ -1,6 +1,6 @@
 ---
 title: "eks-genai"
-description: "Use whenever someone is building, training, fine-tuning, or serving a generative AI / LLM workload on Amazon EKS — phrased as \"GPU vs Trainium/Inferentia\", \"vLLM on EKS\", \"Ray Serve / KubeRay\", \"distributed training on EKS\", \"FSx for Lustre for ML\", \"Karpenter for GPU\", \"EFA / NCCL multi-node\", \"DCGM / Neuron Monitor\", \"LiteLLM / AI gateway\", \"RAG on EKS\", \"agentic AI on EKS\", or \"self-host Llama / Mistral / Qwen\". Walks the opinionated 6-layer stack (compute → cluster/scheduler → frameworks → storage → observability → AI gateway), the GPU-vs-Neuron decision, the JARK + vLLM + LiteLLM canonical reference, KV-cache tiering, cost levers (Neuron, Spot, Capacity Blocks), and a non-negotiable security baseline. Trigger even if \"GenAI\" is never said — any GPU/Neuron, inference-serving, or distributed-training decision on EKS qualifies. Skip for SageMaker-only or Bedrock-only (no self-hosting) asks, and for generic cluster design with no AI/ML workload (use eks-best-practices / eks-design)."
+description: "Use whenever someone is building, training, fine-tuning, or serving a generative AI / LLM workload on Amazon EKS — phrased as \"GPU vs Trainium/Inferentia\", \"vLLM on EKS\", \"Ray Serve / KubeRay\", \"distributed training on EKS\", \"FSx for Lustre for ML\", \"Karpenter for GPU\", \"EFA / NCCL multi-node\", \"DCGM / Neuron Monitor\", \"LiteLLM / AI gateway\", \"RAG on EKS\", \"agentic AI on EKS\", or \"self-host Llama / Mistral / Qwen\". Walks the opinionated 6-layer stack (compute → cluster/scheduler → frameworks → storage → observability → AI gateway), the GPU-vs-Neuron decision, the JARK + vLLM + LiteLLM canonical reference, KV-cache tiering, cost levers (Neuron, Spot, Capacity Blocks), and a non-negotiable security baseline. Trigger even if \"GenAI\" is never said — any GPU/Neuron, inference-serving, or distributed-training decision on EKS qualifies. Skip for SageMaker-only or Bedrock-only (no self-hosting) asks, and for generic cluster design/build with no AI/ML workload (use eks-design / eks-build)."
 custom_edit_url: https://github.com/aws-samples/sample-apex-skills/blob/main/skills/eks-genai/SKILL.md
 format: md
 ---
@@ -30,6 +30,7 @@ Two sources are the canonical foundation and every recommendation must align wit
 - SageMaker-only or Bedrock-only (no self-hosting) — defer to ML/Bedrock guidance; this skill covers Bedrock only as a *gateway target* alongside self-hosted models
 - "Is EKS the right base?" not yet decided — run container-service selection first
 - Generic cluster design/build with no AI/ML workload → `eks-design` / `eks-build`
+- Self-service golden paths / Internal Developer Platform for ML teams (Backstage templates, ML-pipelines-as-a-service, multi-tenant self-serve) → `eks-platform-engineering`. This skill is the GenAI *workload* layer (how to serve/train the model); platform-engineering is the *self-service delivery* layer (how teams request it). Ray Serve can appear in both — use this skill for the serving architecture, that one for the golden-path wrapper.
 - Generic Kubernetes concepts (Claude knows these)
 
 ## The 6-Layer Stack

@@ -46,7 +46,7 @@ GenAI concern: DLCs and vLLM images carry massive dependency trees (PyTorch, CUD
 
 ### 3. Secrets — Secrets Store CSI Driver
 
-**Rule:** Store all secrets (API keys, model registry tokens, Langfuse keys) in **AWS Secrets Manager** or **SSM Parameter Store**. Mount via the [Secrets Store CSI Driver](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html). **NEVER** Kubernetes Secrets (base64, not encrypted at rest by default), ConfigMaps, env vars in Deployment specs, or baked into images.
+**Rule:** Store all secrets (API keys, model registry tokens, Langfuse keys) in **AWS Secrets Manager** or **SSM Parameter Store**. Mount via the [Secrets Store CSI Driver](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html). Avoid **plain Kubernetes Secrets alone** — even with [KMS envelope encryption enabled](https://docs.aws.amazon.com/eks/latest/userguide/envelope-encryption.html) (which addresses encryption-at-rest in etcd), a Secret is readable by anyone with namespace `get/list secrets` RBAC, isn't audited or rotated like Secrets Manager, and is trivially exposed if it lands in Git. The CSI-driver path keeps the source of truth in Secrets Manager (rotation, fine-grained IAM, CloudTrail audit) and never persists a Kubernetes Secret object. Never put secrets in ConfigMaps, env vars in Deployment specs, or baked into images.
 
 ```yaml
 apiVersion: secrets-store.csi.x-k8s.io/v1

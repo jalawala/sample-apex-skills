@@ -27,7 +27,7 @@ Any workload that demands **high aggregate throughput + low latency + POSIX sema
 | Variant | Lifecycle | Cost | Use when… |
 |---------|-----------|------|-----------|
 | **Persistent SSD** | Survives filesystem delete; data persists | Higher | Multi-day training, shared datasets across jobs, checkpoint store |
-| **Scratch SSD** | Ephemeral — deleted with filesystem | Lower (~40% cheaper) | Single training run, throwaway experimentation, benchmarking |
+| **Scratch SSD** | Ephemeral — deleted with filesystem | Lower (AWS's most cost-effective Lustre option; exact delta varies by Persistent throughput tier — check the [FSx for Lustre pricing page](https://aws.amazon.com/fsx/lustre/pricing/)) | Single training run, throwaway experimentation, benchmarking |
 
 ### S3 Data Repository Association (DRA)
 
@@ -175,7 +175,7 @@ spec:
 
 ### When to Use
 
-**RAG vector storage** when cost efficiency matters more than single-digit-ms latency. S3 Vectors provides a serverless, cost-efficient vector store with up to ~90% cost reduction compared to traditional vector databases (OpenSearch, PGVector on Aurora, Pinecone). No cluster provisioning, no capacity planning.
+**RAG vector storage** when cost efficiency matters more than single-digit-ms latency. S3 Vectors (GA since Dec 2025) provides a serverless, cost-efficient vector store — AWS states it reduces the cost to upload, store, and query vectors **by up to 90%** versus specialized vector databases ([S3 Vectors GA announcement](https://aws.amazon.com/about-aws/whats-new/2025/12/amazon-s3-vectors-generally-available)). No cluster provisioning, no capacity planning.
 
 ### Properties
 

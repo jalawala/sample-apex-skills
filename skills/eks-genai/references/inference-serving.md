@@ -9,7 +9,7 @@ Opinionated guidance for choosing and configuring the LLM inference engine on Am
 | **vLLM** | All LLM inference | Transformer-family models (Llama, Mistral, Qwen, Falcon); need OpenAI-compatible API; GPU or Neuron (via `neuronx-distributed-inference`); PagedAttention memory efficiency; continuous batching | Vision/audio/multi-modal; TensorRT-optimized pipelines; non-Transformer architectures |
 | **Ray Serve + KubeRay** | Multi-replica autoscaling | Heterogeneous GPU/Neuron fleets; dynamic replica scaling; Spot integration; multi-model on one cluster; compose vLLM as a Ray Serve deployment | Single-replica deployments (over-engineered); team has no Ray experience and simple workload |
 | **NVIDIA Triton** | Multi-framework serving | Multiple model formats on one server (ONNX + TensorRT + PyTorch); ensemble pipelines; model versioning with A/B traffic split | Single-model LLM serving (vLLM is simpler + higher throughput for LLMs) |
-| **NVIDIA Dynamo** | Disaggregated prefill/decode | Frontier-scale (70B+) multi-node inference; separate prefill workers from decode workers; KV-cache transfer across nodes | Early-stage (July 2025); vLLM is more battle-tested for most deployments today |
+| **NVIDIA Dynamo** | Disaggregated prefill/decode | Frontier-scale (70B+) multi-node inference; separate prefill workers from decode workers; KV-cache transfer across nodes | Newer than vLLM (announced at NVIDIA GTC, March 2025); vLLM is more battle-tested for most deployments today |
 | **KServe** | Scale-to-zero inference | Moderate-traffic models needing scale-to-zero; GPU cost savings during idle; Knative-based serverless model serving | High-throughput LLM serving (cold-start latency is unacceptable for chat); max QPS lower than vLLM+Ray |
 
 **Rule of thumb:** vLLM alone for single-model ≤ 2 replicas; vLLM + Ray Serve for multi-replica autoscaling or multi-model; Triton when TensorRT or multi-framework is the hard requirement; KServe when scale-to-zero matters more than p99 latency.
@@ -166,7 +166,7 @@ Triton on EKS is shipped in [`awslabs/ai-on-eks` `blueprints/inference/nvidia-tr
 
 ## NVIDIA Dynamo — Disaggregated Inference
 
-Dynamo (launched July 2025) separates prefill and decode into independent worker pools — prefill workers handle prompt processing while decode workers generate tokens. This enables:
+Dynamo (announced at NVIDIA GTC in March 2025) separates prefill and decode into independent worker pools — prefill workers handle prompt processing while decode workers generate tokens. This enables:
 
 - Independent scaling of prefill vs decode based on workload mix
 - KV-cache transfer between nodes (prefill produces KV, decode consumes it)

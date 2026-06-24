@@ -35,25 +35,30 @@ Right hardware = f(workload type × model family × latency × cost posture × t
 
 ## NVIDIA GPU Instance Quick-Reference
 
-| Instance | Accelerator | GPU Memory | EFA | Best for |
+Network/EFA values are the per-instance maximums from the EC2 instance-type pages; EFA generation follows the Nitro version (Nitro v3 = EFA v1, no RDMA; Nitro v4+ = EFA v2/v3, with RDMA).
+
+| Instance | Accelerator | GPU Memory | Network / EFA | Best for |
 |---|---|---|---|---|
-| **p5.48xlarge** | 8× NVIDIA H100 SXM5 | 640 GB HBM3 | 3200 Gbps EFAv2 | Frontier pre-training, 100B+ models, multi-node FSDP |
-| **p5e.48xlarge** | 8× NVIDIA H200 SXM5 | ~1.1 TB HBM3e | 3200 Gbps EFAv2 | Same as p5 + larger memory bandwidth for longer contexts |
-| **g6e.48xlarge** | 8× NVIDIA L40S | 384 GB GDDR6 | Up to 200 Gbps | 70B inference, multi-GPU PEFT fine-tune |
-| **g6e.2xlarge** | 1× NVIDIA L40S | 48 GB GDDR6 | — | Single-GPU inference (7B–13B), dev/test, workshop validated |
-| **g6.12xlarge** | 4× NVIDIA L4 | 96 GB GDDR6 | Up to 100 Gbps | 7B–30B inference, cost-sensitive production |
-| **g5.48xlarge** | 8× NVIDIA A10G | 192 GB GDDR6X | Up to 100 Gbps | Multi-modal, NVIDIA NIM, dev/test, legacy workloads |
+| **p5.48xlarge** | 8× NVIDIA H100 SXM5 | 640 GB HBM3 | 3200 Gbps, EFA v2 (GPUDirect RDMA) | Frontier pre-training, 100B+ models, multi-node FSDP |
+| **p5e.48xlarge** | 8× NVIDIA H200 SXM5 | ~1.1 TB HBM3e | 3200 Gbps, EFA v2 (GPUDirect RDMA) | Same as p5 + larger memory for longer contexts |
+| **g6e.48xlarge** | 8× NVIDIA L40S | 384 GB GDDR6 | 400 Gbps, EFA v2 | 70B inference, multi-GPU PEFT fine-tune |
+| **g6e.2xlarge** | 1× NVIDIA L40S | 48 GB GDDR6 | Up to 20 Gbps (no EFA) | Single-GPU inference (7B–13B), dev/test, workshop validated |
+| **g6.12xlarge** | 4× NVIDIA L4 | 96 GB GDDR6 | 40 Gbps, EFA v2 | 7B–30B inference, cost-sensitive production |
+| **g6.48xlarge** | 8× NVIDIA L4 | 192 GB GDDR6 | 100 Gbps, EFA v2 | Larger multi-GPU L4 inference fleets |
+| **g5.48xlarge** | 8× NVIDIA A10G | 192 GB GDDR6 | 100 Gbps, EFA v1 (no RDMA) | Multi-modal, NVIDIA NIM, dev/test, legacy workloads |
 
 > **Workshop-validated**: The GenAI-on-EKS NVIDIA workshop runs on **g6e.2xlarge** (1× L40S, 48 GB) on EKS Auto Mode (Kubernetes 1.34) with Bottlerocket. GPU capacity reserved via On-Demand Capacity Reservation (ODCR) patched into the Karpenter EC2NodeClass via `capacityReservationSelectorTerms`.
 
 ## AWS Neuron Instance Quick-Reference
 
-| Instance | Accelerator | HBM | EFA | Best for |
+Note: Inf2 instances do **not** support EFA — their `inf2.48xlarge` chip-to-chip interconnect is **NeuronLink** (intra-instance), and their external networking is standard ENA. EFA (inter-node fabric) is a Trainium-and-GPU feature.
+
+| Instance | Accelerator | HBM | Network / EFA | Best for |
 |---|---|---|---|---|
-| **trn2.48xlarge** | 16× Trainium2 | High-bandwidth HBM | EFA | Pre-training (3× compute vs Trn1), large-scale fine-tuning |
-| **trn1.32xlarge** | 16× Trainium | 512 GB HBM2e | 800 Gbps EFAv2 | Pre-training, fine-tuning — **up to 50% cost-to-train savings** |
-| **inf2.48xlarge** | 12× Inferentia2 | 384 GB HBM2e | High-bandwidth | High-throughput LLM inference (30B–70B) |
-| **inf2.8xlarge** | 2× Inferentia2 | 64 GB HBM2e | — | Dev/test inference, smaller models (7B–13B) |
+| **trn2.48xlarge** | 16× Trainium2 | 1.5 TB HBM3 | 3.2 Tbps, EFA v3 (RDMA) | Pre-training (3× compute vs Trn1), large-scale fine-tuning |
+| **trn1.32xlarge** | 16× Trainium | 512 GB HBM2e | 800 Gbps, EFA v2 | Pre-training, fine-tuning — **up to 50% cost-to-train savings** |
+| **inf2.48xlarge** | 12× Inferentia2 | 384 GB HBM2e | 100 Gbps ENA (no EFA); NeuronLink chip-to-chip | High-throughput LLM inference (30B–70B) |
+| **inf2.8xlarge** | 2× Inferentia2 | 64 GB HBM2e | Up to 25 Gbps ENA (no EFA) | Dev/test inference, smaller models (7B–13B) |
 
 ## When Each Accelerator Wins — Summary
 
@@ -183,7 +188,7 @@ resources:
 
 ## EKS Auto Mode + GPU Note
 
-On EKS Auto Mode, the NVIDIA driver and device plugin are **embedded in the Bottlerocket AMI** — no `gpu-operator` DaemonSet or separate `nvidia-device-plugin` DaemonSet is needed. The "install nvidia-device-plugin" step you see in most guides applies to **self-managed / standard EKS** only. Auto Mode also auto-enables **SOCI snapshotter** on G/P/Trn instance families for fast parallel image pull from local NVMe storage.
+On EKS Auto Mode, the NVIDIA driver and device plugin are **embedded in the Bottlerocket AMI** — no `gpu-operator` DaemonSet or separate `nvidia-device-plugin` DaemonSet is needed. The "install nvidia-device-plugin" step you see in most guides applies to **self-managed / standard EKS** only. Auto Mode also auto-enables **SOCI parallel pull and unpack** on G/P/Trn instance families with local NVMe (always on as of Nov 19, 2025 — no configuration required), parallelizing image download/decompression for faster GPU-pod starts. Note this is SOCI *parallel pull*, distinct from SOCI lazy/index-based loading (which still needs a pre-built SOCI index in ECR).
 
 ## Sources
 

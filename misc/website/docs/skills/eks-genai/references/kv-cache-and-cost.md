@@ -115,7 +115,7 @@ Savings levers ordered by impact. Apply top-down — each lever is independent; 
 
 | Priority | Lever | Directional savings | When to apply | Caveat |
 |----------|-------|--------------------:|---------------|--------|
-| **1** | **Capacity Blocks for ML** | 30-60% vs on-demand | Planned multi-day training runs; guaranteed p5/p5e/trn2 capacity | Requires advance reservation; not elastic |
+| **1** | **Capacity Blocks for ML** | Capacity assurance (not a fixed discount) | Planned multi-day training runs; guaranteed p5/p5e/trn2 capacity | Reservation-fee pricing set by supply/demand — AWS publishes no fixed discount vs on-demand; primary value is *guaranteed* access, not savings. Requires advance reservation; not elastic |
 | **2** | **Neuron over GPU** | 40-50% price-perf | Transformer-family models (Llama, Mistral, Qwen); steady-state production inference on Inf2; training on Trn1/Trn2 | 1-2 week compilation ramp; not all architectures supported |
 | **3** | **Spot + Checkpoint/Resume** | 60-90% vs on-demand | Fault-tolerant training with FSx checkpoint loop; dev/experimentation | Requires checkpoint logic; interruption risk; NOT for SLA-bound inference |
 | **4** | **MIG / Time-Slicing** | 2-7× density | Shared dev clusters; small models that don't need a full GPU; multi-tenant experimentation | Reduced per-slice memory; not for latency-critical production |
