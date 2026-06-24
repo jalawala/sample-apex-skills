@@ -1,6 +1,6 @@
 ---
 name: eks-design
-description: Use when designing EKS architecture. Generates design documents with Mermaid diagrams, ADRs, security architecture, and validation reports. Translates requirements into tailored EKS designs guided by Well-Architected best practices. Covers cluster architecture, compute, networking, security, addons, observability, cost, and upgrade strategy. Also use when reviewing or validating existing EKS architectures, planning networking or security, evaluating deployment models, or generating architecture diagrams. Skip for short advisory recommendations without a formal document (eks-best-practices) and Internal Developer Platforms or progressive delivery (eks-platform-engineering).
+description: Use when designing EKS architecture. Generates design documents with Mermaid diagrams, ADRs, security architecture, and validation reports. Translates requirements into tailored EKS designs guided by Well-Architected best practices. Covers cluster architecture, compute, networking, security, addons, observability, cost, and upgrade strategy. Also use when reviewing or validating existing EKS architectures, planning networking or security, evaluating deployment models, or generating architecture diagrams. Skip for short advisory recommendations without a formal document (eks-best-practices), Internal Developer Platforms or progressive delivery (eks-platform-engineering), and GenAI/LLM workload design — GPU vs Neuron, vLLM/Ray serving, distributed training (eks-genai).
 ---
 
 # EKS Design
@@ -26,6 +26,7 @@ Generate architecture design documents for production-ready EKS deployments. All
 - Terraform module design or testing (use `terraform-skill`)
 - Detailed reference material on autoscaling, networking, security, observability, cost, reliability, or upgrades (use `eks-best-practices`)
 - Internal Developer Platforms, Backstage portals, golden paths, progressive delivery, or developer self-service (use `eks-platform-engineering`)
+- GenAI / LLM workload design — GPU vs Trainium/Inferentia selection, vLLM / Ray Serve / distributed-training architecture, ML storage (FSx for Lustre), or GPU/Neuron scheduling (use `eks-genai`). Design the *cluster* here; design the *GenAI workload on it* there.
 
 ## Design Output Format
 

@@ -15,5 +15,6 @@
   {"query": "Audit my EKS cluster's operational posture and rate each area GREEN, AMBER, or RED.", "should_trigger": false},
   {"query": "How do I install the EKS MCP server and connect it to my AI assistant so I can query live clusters?", "should_trigger": false},
   {"query": "Explain how Kubernetes StatefulSet rolling updates work at the controller level.", "should_trigger": false},
-  {"query": "Write a standalone Terraform module with native tests for provisioning an S3 bucket.", "should_trigger": false}
+  {"query": "Write a standalone Terraform module with native tests for provisioning an S3 bucket.", "should_trigger": false},
+  {"query": "What GPU instance, inference engine, and KV-cache setup should we use to self-host Llama for serving on EKS?", "should_trigger": false}
 ]

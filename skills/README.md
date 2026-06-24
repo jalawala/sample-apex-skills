@@ -23,7 +23,7 @@ my-skill/
 <!-- SKILLS_DETAIL_START -->
 ### [eks-best-practices](./eks-best-practices/)
 
-Advisory guidance for Amazon EKS architecture and configuration decisions — compute strategy, networking, security, reliability, cost, autoscaling, observability, multi-tenancy, and upgrade planning. Also answers Terraform configuration questions about terraform-aws-modules/terraform-aws-eks. Use for any EKS planning or architectural judgment call, even when phrased casually. Do NOT use for generating documents or code (eks-design, eks-build), scoring or auditing a live cluster (eks-operation-review, eks-upgrade-check), discovering what is running (eks-recon), MCP tooling setup (eks-mcp-server), or building developer platforms and IDPs (eks-platform-engineering).
+Advisory guidance for Amazon EKS architecture and configuration decisions — compute strategy, networking, security, reliability, cost, autoscaling, observability, multi-tenancy, and upgrade planning. Also answers Terraform configuration questions about terraform-aws-modules/terraform-aws-eks. Use for any EKS planning or architectural judgment call, even when phrased casually. Do NOT use for generating documents or code (eks-design, eks-build), scoring or auditing a live cluster (eks-operation-review, eks-upgrade-check), discovering what is running (eks-recon), MCP tooling setup (eks-mcp-server), building developer platforms and IDPs (eks-platform-engineering), or GenAI/LLM workload decisions — GPU vs Trainium/Inferentia, vLLM/Ray serving, distributed training, ML storage (eks-genai).
 
 **References** (loaded on demand):
 
@@ -103,7 +103,7 @@ Run a live EKS cluster cost efficiency assessment — analyze spending across 6 
 
 ### [eks-design](./eks-design/)
 
-Use when designing EKS architecture. Generates design documents with Mermaid diagrams, ADRs, security architecture, and validation reports. Translates requirements into tailored EKS designs guided by Well-Architected best practices. Covers cluster architecture, compute, networking, security, addons, observability, cost, and upgrade strategy. Also use when reviewing or validating existing EKS architectures, planning networking or security, evaluating deployment models, or generating architecture diagrams. Skip for short advisory recommendations without a formal document (eks-best-practices) and Internal Developer Platforms or progressive delivery (eks-platform-engineering).
+Use when designing EKS architecture. Generates design documents with Mermaid diagrams, ADRs, security architecture, and validation reports. Translates requirements into tailored EKS designs guided by Well-Architected best practices. Covers cluster architecture, compute, networking, security, addons, observability, cost, and upgrade strategy. Also use when reviewing or validating existing EKS architectures, planning networking or security, evaluating deployment models, or generating architecture diagrams. Skip for short advisory recommendations without a formal document (eks-best-practices), Internal Developer Platforms or progressive delivery (eks-platform-engineering), and GenAI/LLM workload design — GPU vs Neuron, vLLM/Ray serving, distributed training (eks-genai).
 
 **References** (loaded on demand):
 
@@ -111,6 +111,29 @@ Use when designing EKS architecture. Generates design documents with Mermaid dia
 |-----------|-------------|
 | [architecture-validation.md](./eks-design/references/architecture-validation.md) | Architecture validation |
 | [output-structure.md](./eks-design/references/output-structure.md) | Output structure |
+
+---
+
+### [eks-genai](./eks-genai/)
+
+Use whenever someone is building, training, fine-tuning, or serving a generative AI / LLM workload on Amazon EKS — phrased as "GPU vs Trainium/Inferentia", "vLLM on EKS", "Ray Serve / KubeRay", "distributed training on EKS", "FSx for Lustre for ML", "Karpenter for GPU", "EFA / NCCL multi-node", "DCGM / Neuron Monitor", "LiteLLM / AI gateway", "RAG on EKS", "agentic AI on EKS", or "self-host Llama / Mistral / Qwen". Walks the opinionated 6-layer stack (compute → cluster/scheduler → frameworks → storage → observability → AI gateway), the GPU-vs-Neuron decision, the JARK + vLLM + LiteLLM canonical reference, KV-cache tiering, cost levers (Neuron, Spot, Capacity Blocks), and a non-negotiable security baseline. Trigger even if "GenAI" is never said — any GPU/Neuron, inference-serving, or distributed-training decision on EKS qualifies. Skip for SageMaker-only or Bedrock-only (no self-hosting) asks, and for generic cluster design/build with no AI/ML workload (use eks-design / eks-build).
+
+**References** (loaded on demand):
+
+| Reference | Description |
+|-----------|-------------|
+| [agentic-and-rag.md](./eks-genai/references/agentic-and-rag.md) | Agentic and rag |
+| [ai-gateway.md](./eks-genai/references/ai-gateway.md) | Ai gateway |
+| [cluster-and-scheduling.md](./eks-genai/references/cluster-and-scheduling.md) | Cluster and scheduling |
+| [compute-hardware.md](./eks-genai/references/compute-hardware.md) | Compute hardware |
+| [distributed-training.md](./eks-genai/references/distributed-training.md) | Distributed training |
+| [inference-serving.md](./eks-genai/references/inference-serving.md) | Inference serving |
+| [kv-cache-and-cost.md](./eks-genai/references/kv-cache-and-cost.md) | Kv cache and cost |
+| [observability.md](./eks-genai/references/observability.md) | Observability |
+| [reference-implementations.md](./eks-genai/references/reference-implementations.md) | Reference implementations |
+| [security-and-compliance.md](./eks-genai/references/security-and-compliance.md) | Security and compliance |
+| [storage.md](./eks-genai/references/storage.md) | Storage |
+| [use-cases.md](./eks-genai/references/use-cases.md) | Use cases |
 
 ---
 

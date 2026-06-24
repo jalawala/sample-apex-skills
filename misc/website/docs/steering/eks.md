@@ -32,6 +32,7 @@ Read the user's request and match it to the appropriate workflow:
 | "Resume build" / "Modify existing build" | → [Build Workflow](workflows/eks-build) (resume/modify) | Day 1 |
 | "Which pattern — Terraform vs ArgoCD?" | → [Build Workflow](workflows/eks-build) (pattern selection) | Day 1 |
 | "Build an IDP" / "developer self-service" / "golden paths" / "Backstage portal" / "GitOps + progressive delivery" | → [Platform Engineering](workflows/eks-platform-engineering) | Day 1 |
+| "Build / serve a GenAI or LLM workload" / "self-host an LLM" / "GPU vs Neuron" / "vLLM / Ray Serve" / "RAG / agentic on EKS" | → [GenAI on EKS](workflows/eks-genai) | Day 1 |
 | "Is my cluster ready to upgrade?" / "Run upgrade readiness check" / "Score my upgrade readiness" | → [Upgrade-Readiness Assessment](workflows/eks-upgrade-check) | Day 2 |
 | "Run an EKS operational review" / "Audit my cluster" / "EKS health check" / "Review my EKS posture" | → [Operational Review](workflows/eks-operation-review) | Day 2 |
 | "Check my EKS networking" / "Review RBAC on my cluster" / "Audit observability on my cluster" | → [Operational Review](workflows/eks-operation-review) (section-scoped) | Day 2 |
@@ -77,6 +78,7 @@ When routing between workflows, carry forward any known context. This is critica
 | **Design** | [workflows/design.md](workflows/design) | ✅ Complete | Architecture design questionnaire, reviews, comparisons |
 | **Build** | [workflows/eks-build.md](workflows/eks-build) | ✅ Complete | Multi-phase requirements gathering and Terraform code generation |
 | **Platform Engineering** | [workflows/eks-platform-engineering.md](workflows/eks-platform-engineering) | ✅ Complete | Build an Internal Developer Platform — golden paths, portal, GitOps/progressive delivery, self-service infra, tenancy, DORA |
+| **GenAI on EKS** | [workflows/eks-genai.md](workflows/eks-genai) | ✅ Complete | Build/serve GenAI & LLM workloads — GPU vs Neuron, Karpenter, vLLM/Ray, distributed training, ML storage, observability, AI gateway |
 | **Upgrade-Readiness Assessment** | [workflows/eks-upgrade-check.md](workflows/eks-upgrade-check) | ✅ Complete | Pre-upgrade readiness scoring and remediation report (vendored skill) |
 | **Operational Review** | [workflows/eks-operation-review.md](workflows/eks-operation-review) | ✅ Complete | 10-section operational excellence audit with GREEN/AMBER/RED ratings (vendored skill) |
 
