@@ -71,29 +71,21 @@ In your harness, run:
 
 You should see the EKS reconnaissance skill prompt for cluster context.
 
-## Add Agent Rules (optional)
+## Add Agent Rules (recommended)
 
-Copy the `AGENTS.md` rules file into your project root to instruct any AI agent
-working on your codebase to discover APEX skills and verify claims against
-upstream open-source sources:
+We provide a [`rules/AGENTS.md`](https://github.com/aws-samples/sample-apex-skills/tree/main/rules) file with recommended rules for agents using APEX skills — skill discovery, upstream source verification, and safety guardrails.
 
-```bash
-npx apex-skills --rules
-```
+Add the contents to your project's existing agent configuration:
 
-Or copy manually:
+| Tool | Where to add |
+|------|-------------|
+| Claude Code | Append to your project's `CLAUDE.md` |
+| Cursor | Add to `.cursor/rules/apex.mdc` |
+| Codex | Append to your project's `AGENTS.md` |
+| Kiro | Add to `.kiro/steering/apex-rules.md` |
+| Gemini CLI | Append to your project's `GEMINI.md` |
 
-```bash
-cp ~/.apex-skills/rules/AGENTS.md /path/to/your/project/AGENTS.md
-```
-
-For Claude Code, symlink it as `CLAUDE.md`:
-
-```bash
-cd /path/to/your/project && ln -s AGENTS.md CLAUDE.md
-```
-
-See [`rules/README.md`](https://github.com/aws-samples/sample-apex-skills/tree/main/rules) for tool compatibility.
+See [`rules/README.md`](https://github.com/aws-samples/sample-apex-skills/tree/main/rules) for details.
 
 ## Next steps
 

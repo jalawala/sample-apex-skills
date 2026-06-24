@@ -1,55 +1,41 @@
 # Rules
 
-Project-level agent rules that tell AI coding agents how to use APEX Skills
-effectively — skill discovery, upstream source verification, and safety
-guardrails.
+Recommended agent rules for projects using APEX Skills. These tell AI coding
+agents how to discover skills, verify against upstream sources, and stay safe.
 
 ## Usage
 
-Copy `AGENTS.md` into your project root. Most AI coding agents (Codex, Cursor,
-Gemini CLI, Kiro) discover it automatically via directory traversal.
+Add the contents of `AGENTS.md` to your project's existing agent configuration
+file. Most projects already have one — don't replace it, append to it.
 
-```bash
-cp rules/AGENTS.md /path/to/your/project/AGENTS.md
-```
-
-Or use the installer with `--rules`:
-
-```bash
-npx apex-skills --rules
-```
-
-### Claude Code
-
-Claude Code reads `CLAUDE.md` instead of `AGENTS.md`. Either rename the file or
-create a symlink:
-
-```bash
-cd /path/to/your/project
-ln -s AGENTS.md CLAUDE.md
-```
+| Tool | Add to |
+|------|--------|
+| Claude Code | Your project's `CLAUDE.md` |
+| Cursor | `.cursor/rules/apex.mdc` |
+| OpenAI Codex | Your project's `AGENTS.md` |
+| Kiro | `.kiro/steering/apex-rules.md` |
+| Google Gemini CLI | Your project's `GEMINI.md` |
+| GitHub Copilot | `.github/copilot-instructions.md` |
 
 ## What's inside
 
-The rules file instructs agents to:
+The rules instruct agents to:
 
 1. **Discover skills** — check installed APEX skills before relying on general
-   knowledge.
+   knowledge, with a routing table for all 15 skills.
 2. **Verify against upstream sources** — when uncertain about version-specific
    details, fetch from authoritative open-source repos (Karpenter, VPC CNI,
    CoreDNS, etc.) rather than guessing.
-3. **Use AWS documentation** — prefer the AWS MCP Server or official docs as
-   authoritative sources.
-4. **Follow IaC practices** — prefer Terraform, validate output.
+3. **Use AWS documentation** — prefer the AWS MCP Server or official docs.
+4. **Follow IaC practices** — prefer Terraform, validate output when tooling is
+   available.
 5. **Stay safe** — no destructive ops without confirmation, no secrets in output.
 
-## Compatibility
+## Why this exists
 
-| Tool | Discovery | Notes |
-|------|-----------|-------|
-| OpenAI Codex | Native | Reads `AGENTS.md` from project root |
-| Cursor | Native | Reads `AGENTS.md` from project root and subdirectories |
-| Google Gemini CLI | Configurable | Add `"AGENTS.md"` to `context.fileName` in settings |
-| Kiro | Native | Always reads `AGENTS.md` from workspace root |
-| Claude Code | Symlink/rename | Reads `CLAUDE.md`; symlink `CLAUDE.md → AGENTS.md` |
-| GitHub Copilot | `.github/copilot-instructions.md` | Copy relevant sections there |
+AI agents can go stale on fast-moving ecosystems like EKS. We observed that
+stronger models (e.g., Gemini) will autonomously git-clone upstream repos to
+verify answers. These rules encode that behavior as explicit instructions so
+any model — including weaker ones — can replicate it.
+
+Modeled after [`aws/agent-toolkit-for-aws/rules/aws-agent-rules.md`](https://github.com/aws/agent-toolkit-for-aws/tree/main/rules).
