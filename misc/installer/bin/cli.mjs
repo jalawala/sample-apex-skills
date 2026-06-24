@@ -39,13 +39,18 @@ function parseArgs() {
     const i = args.indexOf(flag);
     return i !== -1 && i + 1 < args.length ? args[i + 1] : null;
   };
+  const rulesIdx = args.indexOf('--rules');
+  let rules = null;
+  if (rulesIdx !== -1) {
+    const next = args[rulesIdx + 1];
+    rules = (next && !next.startsWith('--')) ? next : '.';
+  }
   return {
     claudeOnly: args.includes('--claude-only'),
     kiroOnly: args.includes('--kiro-only'),
     project: args.includes('--project'),
     noSteering: args.includes('--no-steering'),
-    rules: args.includes('--rules'),
-    noRules: args.includes('--no-rules'),
+    rules,
     update: args.includes('--update'),
     uninstall: args.includes('--uninstall'),
     help: args.includes('--help') || args.includes('-h'),
@@ -221,8 +226,7 @@ function showHelp() {
   log(`  --kiro-only          Install for Kiro CLI only`);
   log(`  --project            Install to current project instead of global`);
   log(`  --no-steering        Skip steering/commands setup`);
-  log(`  --rules              Copy AGENTS.md rules file into project root`);
-  log(`  --no-rules           Skip AGENTS.md prompt`);
+  log(`  --rules [path]       Copy AGENTS.md to path (default: current directory)`);
   log(`  --update             Pull latest and re-symlink (non-interactive)`);
   log(`  --version <tag>      Pin to a specific release (e.g. v1.0.0)`);
   log(`  --branch <name>      Use a specific branch instead of main`);
@@ -328,23 +332,28 @@ async function main() {
     }
   }
 
-  // AGENTS.md rules
-  if (!flags.noRules && !flags.update) {
+  // AGENTS.md rules (only when --rules is explicitly passed)
+  if (flags.rules) {
     const rulesSource = join(INSTALL_DIR, 'rules', 'AGENTS.md');
-    if (existsSync(rulesSource)) {
-      let doRules = flags.rules;
-      if (!doRules) {
-        const answer = await ask('Copy AGENTS.md rules to your project root? (y/n)', 'n');
-        doRules = answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes';
-      }
-      if (doRules) {
-        const target = join(process.cwd(), 'AGENTS.md');
+    if (!existsSync(rulesSource)) {
+      warn('rules/AGENTS.md not found in installation — skipping');
+    } else {
+      const targetDir = resolve(flags.rules);
+      if (!existsSync(targetDir)) {
+        error(`Target directory does not exist: ${targetDir}`);
+      } else {
+        const target = join(targetDir, 'AGENTS.md');
         if (existsSync(target)) {
-          warn(`AGENTS.md already exists at ${target} — skipping`);
+          warn(`AGENTS.md already exists at ${target} — skipping (delete it first to overwrite)`);
         } else {
-          copyFileSync(rulesSource, target);
-          success(`Copied AGENTS.md to ${c.dim}${target}${c.reset}`);
-          info('This file tells AI agents how to use APEX skills and verify against upstream sources.');
+          try {
+            copyFileSync(rulesSource, target);
+            success(`Copied AGENTS.md to ${c.dim}${target}${c.reset}`);
+            info('This file tells AI agents how to use APEX skills and verify against upstream sources.');
+            info(`For Claude Code, symlink: ${c.dim}ln -s AGENTS.md CLAUDE.md${c.reset}`);
+          } catch (e) {
+            error(`Failed to copy AGENTS.md: ${e.message}`);
+          }
         }
       }
     }
@@ -356,6 +365,7 @@ async function main() {
   log(`${c.dim}  Skills: ${skills.join(', ')}${c.reset}\n`);
   if (installClaude) log(`  ${c.bold}Claude Code:${c.reset} ask your agent about EKS best practices`);
   if (installKiro) log(`  ${c.bold}Kiro CLI:${c.reset} use /apex commands for guided workflows`);
+  if (flags.rules) log(`  ${c.bold}Rules:${c.reset} AGENTS.md copied — agents will verify against upstream sources`);
   log(`\n  Update anytime: ${c.cyan}npx apex-skills --update${c.reset}`);
   log('');
 }

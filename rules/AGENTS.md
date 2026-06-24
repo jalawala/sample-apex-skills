@@ -23,6 +23,12 @@ so your agent loads it automatically.
   - Ingress migration → `eks-ingress-migration`
   - Cost analysis → `eks-cost-intelligence`
   - MCP server setup → `eks-mcp-server`
+  - Terraform modules → `terraform-skill`
+  - Skill creation/modification → `skill-creator`
+  - Steering workflow authoring → `steering-workflow-creator`
+  - Docs and cross-reference updates → `update-docs`
+
+For structured multi-phase engagements (design, upgrade, operational review), use steering workflows via `/apex:*` commands rather than invoking skills directly.
 
 ## Verify Against Upstream Sources
 
@@ -52,15 +58,17 @@ CoreDNS, and kube-proxy ship new versions frequently. When providing guidance:
    | Cluster Autoscaler | `github.com/kubernetes/autoscaler` |
    | Istio | `github.com/istio/istio` |
    | Gateway API | `github.com/kubernetes-sigs/gateway-api` |
+   | EBS CSI Driver | `github.com/kubernetes-sigs/aws-ebs-csi-driver` |
+   | EFS CSI Driver | `github.com/kubernetes-sigs/aws-efs-csi-driver` |
+   | Pod Identity Agent | `github.com/aws/eks-pod-identity-agent` |
+   | Metrics Server | `github.com/kubernetes-sigs/metrics-server` |
+   | Node Termination Handler | `github.com/aws/aws-node-termination-handler` |
 
-3. **Use DeepWiki** (`deepwiki.com/<org>/<repo>`) for AI-friendly summaries of
-   upstream repos when full clone is impractical.
-
-4. **Check release pages** for breaking changes before recommending version
+3. **Check release pages** for breaking changes before recommending version
    upgrades. Never assume backward compatibility across minor versions of
    Karpenter, VPC CNI, or the AWS Load Balancer Controller.
 
-5. **State uncertainty explicitly.** If you cannot verify a claim against an
+4. **State uncertainty explicitly.** If you cannot verify a claim against an
    upstream source, say so. "I believe X based on skill guidance but have not
    confirmed against the current release" is better than a confident wrong answer.
 
@@ -77,15 +85,19 @@ CoreDNS, and kube-proxy ship new versions frequently. When providing guidance:
 
 - Prefer Terraform with `terraform-aws-modules/terraform-aws-eks` for new
   clusters unless the team has an established CDK/CloudFormation pattern.
-- Never generate Terraform without running `terraform fmt` and
-  `terraform validate` on the output.
-- When generating Kubernetes manifests, validate with `kubectl --dry-run=client`.
+- When `terraform` is available, run `terraform fmt` and `terraform validate` on
+  generated output. In sandboxed environments without CLI access, validate HCL
+  syntax structurally.
+- When generating Kubernetes manifests, validate with `kubectl --dry-run=client`
+  if kubectl is available.
 
 ## Safety
 
-- Never recommend destructive operations (node drain, cluster delete, force
+- Never execute or recommend destructive operations (node drain, cluster delete, force
   pod eviction) without explicit user confirmation and a rollback plan.
 - Upgrades are one-way — always confirm the user has tested in a non-production
   environment first.
 - Secrets, credentials, and kubeconfig contents must never appear in agent output
   or be written to files outside of designated secret stores.
+- Refer to `eks-best-practices` for IAM least-privilege, Pod Disruption Budgets,
+  Pod Security Standards, and network policy guidance.
