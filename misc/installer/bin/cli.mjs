@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, mkdirSync, readdirSync, symlinkSync, readlinkSync, unlinkSync, rmSync, statSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, symlinkSync, readlinkSync, unlinkSync, rmSync, statSync, copyFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { homedir, platform } from 'os';
 import { execSync } from 'child_process';
@@ -44,6 +44,8 @@ function parseArgs() {
     kiroOnly: args.includes('--kiro-only'),
     project: args.includes('--project'),
     noSteering: args.includes('--no-steering'),
+    rules: args.includes('--rules'),
+    noRules: args.includes('--no-rules'),
     update: args.includes('--update'),
     uninstall: args.includes('--uninstall'),
     help: args.includes('--help') || args.includes('-h'),
@@ -219,6 +221,8 @@ function showHelp() {
   log(`  --kiro-only          Install for Kiro CLI only`);
   log(`  --project            Install to current project instead of global`);
   log(`  --no-steering        Skip steering/commands setup`);
+  log(`  --rules              Copy AGENTS.md rules file into project root`);
+  log(`  --no-rules           Skip AGENTS.md prompt`);
   log(`  --update             Pull latest and re-symlink (non-interactive)`);
   log(`  --version <tag>      Pin to a specific release (e.g. v1.0.0)`);
   log(`  --branch <name>      Use a specific branch instead of main`);
@@ -321,6 +325,28 @@ async function main() {
     if (installKiro) {
       const stDir = flags.project ? join(process.cwd(), '.kiro', 'steering') : join(kiroDir, 'steering');
       symlinkSteeringKiro(stDir);
+    }
+  }
+
+  // AGENTS.md rules
+  if (!flags.noRules && !flags.update) {
+    const rulesSource = join(INSTALL_DIR, 'rules', 'AGENTS.md');
+    if (existsSync(rulesSource)) {
+      let doRules = flags.rules;
+      if (!doRules) {
+        const answer = await ask('Copy AGENTS.md rules to your project root? (y/n)', 'n');
+        doRules = answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes';
+      }
+      if (doRules) {
+        const target = join(process.cwd(), 'AGENTS.md');
+        if (existsSync(target)) {
+          warn(`AGENTS.md already exists at ${target} — skipping`);
+        } else {
+          copyFileSync(rulesSource, target);
+          success(`Copied AGENTS.md to ${c.dim}${target}${c.reset}`);
+          info('This file tells AI agents how to use APEX skills and verify against upstream sources.');
+        }
+      }
     }
   }
 

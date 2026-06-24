@@ -71,6 +71,30 @@ In your harness, run:
 
 You should see the EKS reconnaissance skill prompt for cluster context.
 
+## Add Agent Rules (optional)
+
+Copy the `AGENTS.md` rules file into your project root to instruct any AI agent
+working on your codebase to discover APEX skills and verify claims against
+upstream open-source sources:
+
+```bash
+npx apex-skills --rules
+```
+
+Or copy manually:
+
+```bash
+cp ~/.apex-skills/rules/AGENTS.md /path/to/your/project/AGENTS.md
+```
+
+For Claude Code, symlink it as `CLAUDE.md`:
+
+```bash
+cd /path/to/your/project && ln -s AGENTS.md CLAUDE.md
+```
+
+See [`rules/README.md`](https://github.com/aws-samples/sample-apex-skills/tree/main/rules) for tool compatibility.
+
 ## Next steps
 
 - Browse the [Skills](./skills) catalog.
