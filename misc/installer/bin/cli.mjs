@@ -333,6 +333,7 @@ async function main() {
   }
 
   // AGENTS.md rules (only when --rules is explicitly passed)
+  let rulesCopied = false;
   if (flags.rules) {
     const rulesSource = join(INSTALL_DIR, 'rules', 'AGENTS.md');
     if (!existsSync(rulesSource)) {
@@ -351,6 +352,7 @@ async function main() {
             success(`Copied AGENTS.md to ${c.dim}${target}${c.reset}`);
             info('This file tells AI agents how to use APEX skills and verify against upstream sources.');
             info(`For Claude Code, symlink: ${c.dim}ln -s AGENTS.md CLAUDE.md${c.reset}`);
+            rulesCopied = true;
           } catch (e) {
             error(`Failed to copy AGENTS.md: ${e.message}`);
           }
@@ -365,7 +367,7 @@ async function main() {
   log(`${c.dim}  Skills: ${skills.join(', ')}${c.reset}\n`);
   if (installClaude) log(`  ${c.bold}Claude Code:${c.reset} ask your agent about EKS best practices`);
   if (installKiro) log(`  ${c.bold}Kiro CLI:${c.reset} use /apex commands for guided workflows`);
-  if (flags.rules) log(`  ${c.bold}Rules:${c.reset} AGENTS.md copied — agents will verify against upstream sources`);
+  if (rulesCopied) log(`  ${c.bold}Rules:${c.reset} AGENTS.md copied — agents will verify against upstream sources`);
   log(`\n  Update anytime: ${c.cyan}npx apex-skills --update${c.reset}`);
   log('');
 }

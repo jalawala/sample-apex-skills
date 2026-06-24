@@ -28,7 +28,7 @@ so your agent loads it automatically.
   - Steering workflow authoring → `steering-workflow-creator`
   - Docs and cross-reference updates → `update-docs`
 
-For structured multi-phase engagements (design, upgrade, operational review), use steering workflows via `/apex:*` commands rather than invoking skills directly.
+For structured multi-phase engagements (design, upgrade, operational review), use steering workflows (e.g., `apex:eks-design`, `apex:eks-upgrade-check`) rather than invoking skills directly. Invocation syntax varies by agent — `/apex:*` in Claude Code, steering files in Kiro.
 
 ## Verify Against Upstream Sources
 
