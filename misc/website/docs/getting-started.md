@@ -85,7 +85,7 @@ Add the contents to your project's existing agent configuration:
 | Kiro | Add to `.kiro/steering/apex-rules.md` |
 | Gemini CLI | Append to your project's `GEMINI.md` |
 
-See [`rules/README.md`](https://github.com/aws-samples/sample-apex-skills/tree/main/rules) for details.
+See [`rules/AGENTS.md`](https://github.com/aws-samples/sample-apex-skills/blob/main/rules/AGENTS.md) for the full content.
 
 ## Next steps
 
