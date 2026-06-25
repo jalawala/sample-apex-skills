@@ -6,7 +6,7 @@ This guide explains how the repository is organized, where new content should go
 
 ## Repository Architecture
 
-APEX organizes content into three directories, each serving a distinct purpose in the agentic workflow. Understanding the distinction is critical — putting content in the wrong place degrades the agent's performance.
+APEX organizes content into four directories, each serving a distinct purpose in the agentic workflow. Understanding the distinction is critical — putting content in the wrong place degrades the agent's performance.
 
 ```
 sample-apex-skills/
@@ -14,6 +14,7 @@ sample-apex-skills/
 │   ├── commands/       →   Slash command definitions (harness-specific entry points)
 │   └── workflows/      →   Structured engagement playbooks
 ├── skills/             → 📚 WHAT the agent knows (domain knowledge)
+├── rules/              → 📏 Project-level agent rules (AGENTS.md for consumers)
 └── examples/           → 🏗️ HOW to try it (hands-on exercises)
 ```
 

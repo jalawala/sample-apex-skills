@@ -16,6 +16,7 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 sample-apex-skills/
 ├── skills/       → 📚 Domain knowledge (platform-engineering best practices, Terraform, skill creation)
 ├── steering/     → 🎯 Guided workflows (optional — structured engagement playbooks)
+├── rules/        → 📏 Agent rules (project-level AGENTS.md for consumers)
 ├── examples/     → 🏗️ Hands-on exercises (deployable labs with planted issues)
 └── misc/         → 🔧 Maintenance and tooling
     ├── evals/    → 🧪 5-layer skill evaluation framework (triggering, process, artifact, knowledge, quality)
@@ -26,10 +27,11 @@ sample-apex-skills/
 |-----------|---------|-------------------|
 | `skills/` | **What** the agent knows — reusable domain knowledge | An expert's brain |
 | `steering/` | **How** the agent runs an engagement — slash commands, questionnaires, checkpoints, routing | A senior SA's playbook |
+| `rules/` | **How** the agent behaves — verification, source-checking, guardrails | A safety checklist |
 | `examples/` | **How** to try it — deploy, run APEX against it, see results | A workshop lab |
 | `misc/` | Maintenance tooling and per-skill evaluation inputs | The toolbox |
 
-> **Key principle:** Skills provide the knowledge. Steering provides the structure.  
+> **Key principle:** Skills provide the knowledge. Steering provides the structure. Rules provide the guardrails.  
 
 ---
 
