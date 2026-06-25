@@ -23,7 +23,7 @@ my-skill/
 <!-- SKILLS_DETAIL_START -->
 ### [eks-best-practices](./eks-best-practices/)
 
-Advisory guidance for Amazon EKS architecture and configuration decisions — compute strategy, networking, security, reliability, cost, autoscaling, observability, multi-tenancy, and upgrade planning. Also answers Terraform configuration questions about terraform-aws-modules/terraform-aws-eks. Use for any EKS planning or architectural judgment call, even when phrased casually. Do NOT use for generating documents or code (eks-design, eks-build), scoring or auditing a live cluster (eks-operation-review, eks-upgrade-check), discovering what is running (eks-recon), MCP tooling setup (eks-mcp-server), building developer platforms and IDPs (eks-platform-engineering), or GenAI/LLM workload decisions — GPU vs Trainium/Inferentia, vLLM/Ray serving, distributed training, ML storage (eks-genai).
+Advisory guidance for Amazon EKS architecture and configuration decisions — compute strategy, networking, security, reliability, cost, autoscaling, observability, multi-tenancy, and upgrade planning. Also answers Terraform configuration questions about terraform-aws-modules/terraform-aws-eks. Use for any EKS planning or architectural judgment call, even when phrased casually. Do NOT use for generating documents or code (eks-design, eks-build), scoring or auditing a live cluster (eks-operation-review, eks-upgrade-check), discovering what is running (eks-recon), MCP tooling setup (eks-mcp-server), building developer platforms and IDPs (eks-platform-engineering), GenAI/LLM workload decisions — GPU vs Trainium/Inferentia, vLLM/Ray serving, distributed training, ML storage (eks-genai), or compliance-regime hardening and audit prep — HIPAA/PCI/FedRAMP, CIS benchmarks, GuardDuty, image signing (eks-security).
 
 **References** (loaded on demand):
 
@@ -179,7 +179,7 @@ Install, configure, and troubleshoot the EKS MCP Server connection in your AI as
 
 ### [eks-operation-review](./eks-operation-review/)
 
-Run a structured EKS operational excellence assessment against a live cluster. Covers 10 areas — networking, autoscaling, observability, access & identity, add-ons, workload config, deployments, cluster lifecycle, IaC, operational processes — and produces a GREEN/AMBER/RED rated report with prioritized recommendations. Activate for any request to audit, review, health-check, or score an EKS cluster's operational posture, including section-scoped reviews of individual areas. Not for upgrade readiness, cluster discovery, or architectural design advice.
+Run a structured EKS operational excellence assessment against a live cluster. Covers 10 areas — networking, autoscaling, observability, access & identity, add-ons, workload config, deployments, cluster lifecycle, IaC, operational processes — and produces a GREEN/AMBER/RED rated report with prioritized recommendations. Activate for any request to audit, review, health-check, or score an EKS cluster's operational posture, including section-scoped reviews of individual areas. Not for upgrade readiness, cluster discovery, architectural design advice, or compliance-regime hardening and audit prep (HIPAA/PCI/FedRAMP, CIS benchmarks, GuardDuty, image signing — use eks-security).
 
 **References** (loaded on demand):
 
@@ -259,6 +259,29 @@ EKS cluster reconnaissance and environment discovery. Detects compute strategy (
 | [security-recon.md](./eks-recon/agents/security-recon.md) | Security recon |
 | [storage-recon.md](./eks-recon/agents/storage-recon.md) | Storage recon |
 | [workloads-recon.md](./eks-recon/agents/workloads-recon.md) | Workloads recon |
+
+---
+
+### [eks-security](./eks-security/)
+
+Use whenever someone needs security or compliance guidance for Amazon EKS — phrased as "CIS Benchmark for EKS", "HIPAA / PCI-DSS / FedRAMP / SOC 2 / GDPR on EKS", "harden my EKS cluster", "Bottlerocket vs AL2023 vs RHEL/Ubuntu AMI", "EKS Pod Identity vs IRSA", "Access Entries vs aws-auth", "GuardDuty for EKS", "Pod Security Admission / Kyverno / OPA", "NetworkPolicy / Security Groups for Pods", "ECR scanning / image signing (Cosign / Notation)", "EKS audit logging", "etcd / secrets encryption", or regulated-workload / audit-prep guidance. Walks the discovery-driven 7-layer security stack (OS/AMI → identity → workload → image → runtime → audit → compliance accelerators), the compliance-regime scope view, the AWS-canonical baseline, and a 30/60/90 hardening roadmap. Trigger even if "compliance" is never said — any EKS hardening, audit-prep, or regulated-workload decision qualifies. Skip for non-EKS (ECS/ROSA), account-level security with no EKS angle, or GenAI-workload security (use eks-genai).
+
+**References** (loaded on demand):
+
+| Reference | Description |
+|-----------|-------------|
+| [audit-logging.md](./eks-security/references/audit-logging.md) | Audit logging |
+| [compliance-accelerators.md](./eks-security/references/compliance-accelerators.md) | Compliance accelerators |
+| [compliance-regimes.md](./eks-security/references/compliance-regimes.md) | Compliance regimes |
+| [encryption-and-secrets.md](./eks-security/references/encryption-and-secrets.md) | Encryption and secrets |
+| [engagement-and-response.md](./eks-security/references/engagement-and-response.md) | Engagement and response |
+| [identity-and-access.md](./eks-security/references/identity-and-access.md) | Identity and access |
+| [image-supply-chain.md](./eks-security/references/image-supply-chain.md) | Image supply chain |
+| [incident-response-and-forensics.md](./eks-security/references/incident-response-and-forensics.md) | Incident response and forensics |
+| [multi-tenancy.md](./eks-security/references/multi-tenancy.md) | Multi tenancy |
+| [os-ami-hardening.md](./eks-security/references/os-ami-hardening.md) | Os ami hardening |
+| [runtime-security.md](./eks-security/references/runtime-security.md) | Runtime security |
+| [workload-security.md](./eks-security/references/workload-security.md) | Workload security |
 
 ---
 

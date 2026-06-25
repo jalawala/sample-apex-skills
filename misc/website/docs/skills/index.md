@@ -10,7 +10,7 @@ description: "Browse all APEX skills for AWS platform engineering — EKS archit
 
 ## [eks-best-practices](./eks-best-practices/)
 
-Advisory guidance for Amazon EKS architecture and configuration decisions — compute strategy, networking, security, reliability, cost, autoscaling, observability, multi-tenancy, and upgrade planning. Also answers Terraform configuration questions about terraform-aws-modules/terraform-aws-eks. Use for any EKS planning or architectural judgment call, even when phrased casually. Do NOT use for generating documents or code (eks-design, eks-build), scoring or auditing a live cluster (eks-operation-review, eks-upgrade-check), discovering what is running (eks-recon), MCP tooling setup (eks-mcp-server), building developer platforms and IDPs (eks-platform-engineering), or GenAI/LLM workload decisions — GPU vs Trainium/Inferentia, vLLM/Ray serving, distributed training, ML storage (eks-genai).
+Advisory guidance for Amazon EKS architecture and configuration decisions — compute strategy, networking, security, reliability, cost, autoscaling, observability, multi-tenancy, and upgrade planning. Also answers Terraform configuration questions about terraform-aws-modules/terraform-aws-eks. Use for any EKS planning or architectural judgment call, even when phrased casually. Do NOT use for generating documents or code (eks-design, eks-build), scoring or auditing a live cluster (eks-operation-review, eks-upgrade-check), discovering what is running (eks-recon), MCP tooling setup (eks-mcp-server), building developer platforms and IDPs (eks-platform-engineering), GenAI/LLM workload decisions — GPU vs Trainium/Inferentia, vLLM/Ray serving, distributed training, ML storage (eks-genai), or compliance-regime hardening and audit prep — HIPAA/PCI/FedRAMP, CIS benchmarks, GuardDuty, image signing (eks-security).
 
 ## [eks-build](./eks-build/)
 
@@ -38,7 +38,7 @@ Install, configure, and troubleshoot the EKS MCP Server connection in your AI as
 
 ## [eks-operation-review](./eks-operation-review/)
 
-Run a structured EKS operational excellence assessment against a live cluster. Covers 10 areas — networking, autoscaling, observability, access & identity, add-ons, workload config, deployments, cluster lifecycle, IaC, operational processes — and produces a GREEN/AMBER/RED rated report with prioritized recommendations. Activate for any request to audit, review, health-check, or score an EKS cluster's operational posture, including section-scoped reviews of individual areas. Not for upgrade readiness, cluster discovery, or architectural design advice.
+Run a structured EKS operational excellence assessment against a live cluster. Covers 10 areas — networking, autoscaling, observability, access & identity, add-ons, workload config, deployments, cluster lifecycle, IaC, operational processes — and produces a GREEN/AMBER/RED rated report with prioritized recommendations. Activate for any request to audit, review, health-check, or score an EKS cluster's operational posture, including section-scoped reviews of individual areas. Not for upgrade readiness, cluster discovery, architectural design advice, or compliance-regime hardening and audit prep (HIPAA/PCI/FedRAMP, CIS benchmarks, GuardDuty, image signing — use eks-security).
 
 ## [eks-platform-engineering](./eks-platform-engineering/)
 
@@ -47,6 +47,10 @@ Use whenever someone is designing or building an Internal Developer Platform (ID
 ## [eks-recon](./eks-recon/)
 
 EKS cluster reconnaissance and environment discovery. Detects compute strategy (Karpenter, MNG, Auto Mode, Fargate), IaC tooling (Terraform, CloudFormation, CDK, eksctl), CI/CD pipelines (GitHub Actions, GitLab, ArgoCD, Flux), add-on inventory, networking, security posture, and observability. Use this skill whenever someone asks about their EKS cluster, wants to understand their setup, is planning an upgrade or migration, needs cluster context for any reason, asks what version am I running, mentions wanting to review or document their cluster, or is about to make any EKS-related decision - even if they don't explicitly say reconnaissance or discovery. When in doubt about cluster state, run recon first. Skip for upgrade readiness scoring or deprecated API checks (eks-upgrade-check), operational audits with GREEN/AMBER/RED ratings (eks-operation-review), and architecture design documents or Mermaid diagrams (eks-design).
+
+## [eks-security](./eks-security/)
+
+Use whenever someone needs security or compliance guidance for Amazon EKS — phrased as "CIS Benchmark for EKS", "HIPAA / PCI-DSS / FedRAMP / SOC 2 / GDPR on EKS", "harden my EKS cluster", "Bottlerocket vs AL2023 vs RHEL/Ubuntu AMI", "EKS Pod Identity vs IRSA", "Access Entries vs aws-auth", "GuardDuty for EKS", "Pod Security Admission / Kyverno / OPA", "NetworkPolicy / Security Groups for Pods", "ECR scanning / image signing (Cosign / Notation)", "EKS audit logging", "etcd / secrets encryption", or regulated-workload / audit-prep guidance. Walks the discovery-driven 7-layer security stack (OS/AMI → identity → workload → image → runtime → audit → compliance accelerators), the compliance-regime scope view, the AWS-canonical baseline, and a 30/60/90 hardening roadmap. Trigger even if "compliance" is never said — any EKS hardening, audit-prep, or regulated-workload decision qualifies. Skip for non-EKS (ECS/ROSA), account-level security with no EKS angle, or GenAI-workload security (use eks-genai).
 
 ## [eks-upgrade-check](./eks-upgrade-check/)
 

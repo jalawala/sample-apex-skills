@@ -14,6 +14,7 @@ The discriminator for `eks-genai` is a **GenAI/LLM workload running on EKS with 
 - **`eks-build`** (generating deployable EKS Terraform / addon infrastructure code) — negative 12 ("Generate the Terraform to provision an EKS cluster with Karpenter and the LB controller").
 - **`eks-platform-engineering`** (building an Internal Developer Platform / self-service paved paths on EKS) — negatives 13, 14 ("self-service golden paths via Backstage and ArgoCD", "progressive delivery with Argo Rollouts and multi-stage promotion").
 - **Generic / managed-service (no EKS self-hosting)** (Amazon Bedrock managed LLM API, or SageMaker training — not a self-hosted EKS workload) — negatives 15, 16 ("managed LLM API with no infrastructure — just use Bedrock?", "fine-tune a model using SageMaker training jobs").
+- **`eks-security`** (EKS security & compliance hardening — CIS, HIPAA/PCI/FedRAMP/GDPR, Pod Identity/Access Entries, PSA, GuardDuty, image signing, audit logging) — negative 17 ("What's the EKS security baseline and CI…").
 <!-- SIBLING_MAP_END -->
 
 The key discriminator: the prompt is about a self-hosted GenAI/LLM workload on EKS (accelerator choice, vLLM/Ray serving, distributed training, ML storage, GPU/Neuron observability, AI gateway, agentic/RAG) — not a generic EKS cluster decision, an architecture doc/ADR, Terraform generation, a developer self-service platform, or a fully-managed Bedrock/SageMaker path.

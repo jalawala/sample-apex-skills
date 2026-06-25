@@ -1,18 +1,70 @@
 [
-  { "query": "We want to self-host Llama 3 8B on our EKS cluster for a product feature. What inference stack should we run, and should we use GPU or Inferentia?", "should_trigger": true },
-  { "query": "Set up distributed fine-tuning of a 70B model on EKS across multiple nodes with EFA and checkpointing to FSx for Lustre.", "should_trigger": true },
-  { "query": "Deploy vLLM with Ray Serve on EKS to serve Mistral with autoscaling — how should the Karpenter NodePools and model storage be configured?", "should_trigger": true },
-  { "query": "We're spending too much on g6 GPU inference for our production LLM. Can we migrate serving to Inferentia2 on EKS, and what's the integration effort?", "should_trigger": true },
-  { "query": "How do I wire DCGM and Prometheus/Grafana to observe GPU utilization and vLLM token latency (TTFT) on our EKS cluster?", "should_trigger": true },
-  { "query": "Stand up a LiteLLM gateway on EKS that routes between our self-hosted Qwen and Claude on Bedrock with per-tenant cost tracking.", "should_trigger": true },
-  { "query": "Build an agentic AI app on EKS using Strands Agents with self-hosted models plus Bedrock for reasoning — where does each piece run?", "should_trigger": true },
-  { "query": "We need a RAG pipeline on EKS — which vector store should we use and how do we serve the embeddings and the LLM cost-efficiently?", "should_trigger": true },
-  { "query": "What VPC CNI mode and subnet sizing should we use for a general-purpose multi-AZ EKS cluster?", "should_trigger": false },
-  { "query": "Should we use EKS Pod Identity or IRSA, and what PodDisruptionBudget settings for our production web services?", "should_trigger": false },
-  { "query": "Produce an architecture design document and an ADR for our new multi-tenant EKS platform.", "should_trigger": false },
-  { "query": "Generate the Terraform to provision an EKS cluster with Karpenter and the AWS Load Balancer Controller.", "should_trigger": false },
-  { "query": "Give our app teams self-service golden paths to deploy services on EKS via Backstage and ArgoCD.", "should_trigger": false },
-  { "query": "Set up progressive delivery with Argo Rollouts and multi-stage promotion for our internal developer platform.", "should_trigger": false },
-  { "query": "We just want a managed LLM API with no infrastructure to run — should we just use Amazon Bedrock?", "should_trigger": false },
-  { "query": "How do I fine-tune a model using Amazon SageMaker training jobs?", "should_trigger": false }
+  {
+    "query": "We want to self-host Llama 3 8B on our EKS cluster for a product feature. What inference stack should we run, and should we use GPU or Inferentia?",
+    "should_trigger": true
+  },
+  {
+    "query": "Set up distributed fine-tuning of a 70B model on EKS across multiple nodes with EFA and checkpointing to FSx for Lustre.",
+    "should_trigger": true
+  },
+  {
+    "query": "Deploy vLLM with Ray Serve on EKS to serve Mistral with autoscaling \u2014 how should the Karpenter NodePools and model storage be configured?",
+    "should_trigger": true
+  },
+  {
+    "query": "We're spending too much on g6 GPU inference for our production LLM. Can we migrate serving to Inferentia2 on EKS, and what's the integration effort?",
+    "should_trigger": true
+  },
+  {
+    "query": "How do I wire DCGM and Prometheus/Grafana to observe GPU utilization and vLLM token latency (TTFT) on our EKS cluster?",
+    "should_trigger": true
+  },
+  {
+    "query": "Stand up a LiteLLM gateway on EKS that routes between our self-hosted Qwen and Claude on Bedrock with per-tenant cost tracking.",
+    "should_trigger": true
+  },
+  {
+    "query": "Build an agentic AI app on EKS using Strands Agents with self-hosted models plus Bedrock for reasoning \u2014 where does each piece run?",
+    "should_trigger": true
+  },
+  {
+    "query": "We need a RAG pipeline on EKS \u2014 which vector store should we use and how do we serve the embeddings and the LLM cost-efficiently?",
+    "should_trigger": true
+  },
+  {
+    "query": "What VPC CNI mode and subnet sizing should we use for a general-purpose multi-AZ EKS cluster?",
+    "should_trigger": false
+  },
+  {
+    "query": "Should we use EKS Pod Identity or IRSA, and what PodDisruptionBudget settings for our production web services?",
+    "should_trigger": false
+  },
+  {
+    "query": "Produce an architecture design document and an ADR for our new multi-tenant EKS platform.",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate the Terraform to provision an EKS cluster with Karpenter and the AWS Load Balancer Controller.",
+    "should_trigger": false
+  },
+  {
+    "query": "Give our app teams self-service golden paths to deploy services on EKS via Backstage and ArgoCD.",
+    "should_trigger": false
+  },
+  {
+    "query": "Set up progressive delivery with Argo Rollouts and multi-stage promotion for our internal developer platform.",
+    "should_trigger": false
+  },
+  {
+    "query": "We just want a managed LLM API with no infrastructure to run \u2014 should we just use Amazon Bedrock?",
+    "should_trigger": false
+  },
+  {
+    "query": "How do I fine-tune a model using Amazon SageMaker training jobs?",
+    "should_trigger": false
+  },
+  {
+    "query": "What's the EKS security baseline and CIS hardening for a regulated cluster \u2014 Pod Identity, PSA restricted, GuardDuty, encryption?",
+    "should_trigger": false
+  }
 ]
