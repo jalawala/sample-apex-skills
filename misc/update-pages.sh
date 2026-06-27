@@ -96,10 +96,24 @@ first_heading() {
 }
 
 # --- Derive title from filename -------------------------------------------
+# Replace hyphens with spaces and title-case each word. Uses awk rather than
+# `sed 's/\b\(.\)/\u\1/g'` because the \b word boundary and \u uppercase escape
+# are GNU-only; on BSD/macOS sed they silently no-op and leave titles lowercase.
 title_from_filename() {
   local base="$1"
   base="${base%.md}"
-  echo "$base" | sed 's/-/ /g; s/\b\(.\)/\u\1/g'
+  printf '%s\n' "$base" | awk '{
+    gsub(/-/, " ")
+    cap = 1; out = ""
+    for (i = 1; i <= length($0); i++) {
+      c = substr($0, i, 1)
+      if (cap && c ~ /[a-z]/) { c = toupper(c); cap = 0 }
+      else if (c ~ /[a-zA-Z0-9]/) { cap = 0 }
+      else { cap = 1 }
+      out = out c
+    }
+    print out
+  }'
 }
 
 # --- Strip leading YAML frontmatter from a markdown file ------------------
