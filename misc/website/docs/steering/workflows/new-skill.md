@@ -145,7 +145,11 @@ Steps, in order:
    ./misc/update-all-references.sh
    ./misc/update-pages.sh
    ```
-   Verify the Docusaurus wrapper was generated: `ls misc/website/docs/skills/<name>/index.md` — if missing, the staging step was skipped.
+   Now assert the wrapper was actually generated — if you ran the scripts before `git add`, `update-pages.sh` reads an index without the new skill and silently emits no pages, which fails `docs-sync` CI later:
+   ```bash
+   ls misc/website/docs/skills/<name>/index.md \
+     || { echo "ERROR: wrapper not generated — 'git add' the skill BEFORE running update-pages.sh"; exit 1; }
+   ```
    Stage all generated output and commit:
    ```bash
    git add -A && git commit -m "docs: regenerate reference tables and pages"
