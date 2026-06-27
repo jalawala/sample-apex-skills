@@ -1,29 +1,114 @@
 [
-  {"query": "We're standing up a new EKS cluster for a growing platform team. Should we default to Karpenter, managed node groups, or EKS Auto Mode for the data plane?", "should_trigger": true},
-  {"query": "Three product teams want to share one EKS cluster. What's the right approach for tenant isolation across namespaces, node pools, and network policies?", "should_trigger": true},
-  {"query": "Our VPC is running short on IPs and we expect 50+ pods per node. How should we plan subnets and VPC CNI mode for a new EKS cluster?", "should_trigger": true},
-  {"query": "For a new EKS workload that needs AWS permissions, should we use IRSA or EKS Pod Identity? Any reason to still pick IRSA for new stuff?", "should_trigger": true},
-  {"query": "We're about to roll out our first production services on EKS. What PDBs, probes, and topology spread settings should we put in place for reliability?", "should_trigger": true},
-  {"query": "We have a critical production EKS cluster and an upgrade coming up. Should we do in-place or blue-green? How do we decide?", "should_trigger": true},
-  {"query": "EKS bill is creeping up. What are the highest-leverage cost levers — Graviton, Spot, Karpenter consolidation — and in what order?", "should_trigger": true},
-  {"query": "Here's our node group setup: 2 m5.large on-demand nodes in one AZ, no PDBs, no ingress controller yet. Is this reasonable for prod?", "should_trigger": true},
-
-  {"query": "What version of Kubernetes is my EKS cluster currently running, and which add-ons are installed?", "should_trigger": false},
-  {"query": "Can you inventory what's in my EKS cluster right now — node groups, Karpenter, ingress, CI/CD tooling — before I plan an upgrade?", "should_trigger": false},
-  {"query": "I need a snapshot of everything running in the cluster: workloads, namespaces, IAM associations. Discovery only, no recommendations yet.", "should_trigger": false},
-  {"query": "How do I install the EKS MCP server and wire it up to Claude Code so I can query live clusters?", "should_trigger": false},
-  {"query": "What's the difference between a Kubernetes Deployment and a StatefulSet, and when would I use each?", "should_trigger": false},
-  {"query": "We're evaluating AKS vs GKE for a new workload. Which managed Kubernetes service has better node autoscaling out of the box?", "should_trigger": false},
-  {"query": "Is my EKS cluster ready to move from 1.29 to 1.30? Run the readiness checks and give me a score.", "should_trigger": false},
-  {"query": "Audit my EKS cluster's operational posture — score each area GREEN/AMBER/RED and produce a maturity report.", "should_trigger": false},
-  {"query": "Run a cost audit on my EKS cluster — I need dollar figures showing exactly how much each namespace is wasting.", "should_trigger": false},
-  {"query": "Score my cluster's cost efficiency and produce a report with prioritized savings for our FinOps review.", "should_trigger": false},
-  {"query": "We want app teams to self-serve deployments to EKS through a developer portal with golden paths — how do we stand up that platform?", "should_trigger": false},
-  {"query": "Set up Backstage, ArgoCD, and Kargo so our developers get a paved self-service CI/CD path on our EKS platform.", "should_trigger": false},
-  {"query": "Generate a complete EKS architecture design document with ADRs and Mermaid diagrams for our fintech platform", "should_trigger": false},
-  {"query": "Score and validate this EKS architecture against Well-Architected best practices, output a formal validation report", "should_trigger": false},
-  {"query": "Generate a production-ready Terraform project for an EKS cluster with Karpenter and ArgoCD Pattern 2a", "should_trigger": false},
-  {"query": "Add external-secrets and cert-manager addons to our EKS Terraform project with proper IRSA configuration", "should_trigger": false},
-  {"query": "Audit our ingress controllers and score the migration off nginx to ALB.", "should_trigger": false},
-  {"query": "We're self-hosting Llama 3 on EKS — should we run it on g6e GPU nodes or Inferentia2, and should serving be vLLM or Ray Serve?", "should_trigger": false}
+  {
+    "query": "We're standing up a new EKS cluster for a growing platform team. Should we default to Karpenter, managed node groups, or EKS Auto Mode for the data plane?",
+    "should_trigger": true
+  },
+  {
+    "query": "Three product teams want to share one EKS cluster. What's the right approach for tenant isolation across namespaces, node pools, and network policies?",
+    "should_trigger": true
+  },
+  {
+    "query": "Our VPC is running short on IPs and we expect 50+ pods per node. How should we plan subnets and VPC CNI mode for a new EKS cluster?",
+    "should_trigger": true
+  },
+  {
+    "query": "For a new EKS workload that needs AWS permissions, should we use IRSA or EKS Pod Identity? Any reason to still pick IRSA for new stuff?",
+    "should_trigger": true
+  },
+  {
+    "query": "We're about to roll out our first production services on EKS. What PDBs, probes, and topology spread settings should we put in place for reliability?",
+    "should_trigger": true
+  },
+  {
+    "query": "We have a critical production EKS cluster and an upgrade coming up. Should we do in-place or blue-green? How do we decide?",
+    "should_trigger": true
+  },
+  {
+    "query": "EKS bill is creeping up. What are the highest-leverage cost levers \u2014 Graviton, Spot, Karpenter consolidation \u2014 and in what order?",
+    "should_trigger": true
+  },
+  {
+    "query": "Here's our node group setup: 2 m5.large on-demand nodes in one AZ, no PDBs, no ingress controller yet. Is this reasonable for prod?",
+    "should_trigger": true
+  },
+  {
+    "query": "What version of Kubernetes is my EKS cluster currently running, and which add-ons are installed?",
+    "should_trigger": false
+  },
+  {
+    "query": "Can you inventory what's in my EKS cluster right now \u2014 node groups, Karpenter, ingress, CI/CD tooling \u2014 before I plan an upgrade?",
+    "should_trigger": false
+  },
+  {
+    "query": "I need a snapshot of everything running in the cluster: workloads, namespaces, IAM associations. Discovery only, no recommendations yet.",
+    "should_trigger": false
+  },
+  {
+    "query": "How do I install the EKS MCP server and wire it up to Claude Code so I can query live clusters?",
+    "should_trigger": false
+  },
+  {
+    "query": "What's the difference between a Kubernetes Deployment and a StatefulSet, and when would I use each?",
+    "should_trigger": false
+  },
+  {
+    "query": "We're evaluating AKS vs GKE for a new workload. Which managed Kubernetes service has better node autoscaling out of the box?",
+    "should_trigger": false
+  },
+  {
+    "query": "Is my EKS cluster ready to move from 1.29 to 1.30? Run the readiness checks and give me a score.",
+    "should_trigger": false
+  },
+  {
+    "query": "Audit my EKS cluster's operational posture \u2014 score each area GREEN/AMBER/RED and produce a maturity report.",
+    "should_trigger": false
+  },
+  {
+    "query": "Run a cost audit on my EKS cluster \u2014 I need dollar figures showing exactly how much each namespace is wasting.",
+    "should_trigger": false
+  },
+  {
+    "query": "Score my cluster's cost efficiency and produce a report with prioritized savings for our FinOps review.",
+    "should_trigger": false
+  },
+  {
+    "query": "We want app teams to self-serve deployments to EKS through a developer portal with golden paths \u2014 how do we stand up that platform?",
+    "should_trigger": false
+  },
+  {
+    "query": "Set up Backstage, ArgoCD, and Kargo so our developers get a paved self-service CI/CD path on our EKS platform.",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate a complete EKS architecture design document with ADRs and Mermaid diagrams for our fintech platform",
+    "should_trigger": false
+  },
+  {
+    "query": "Score and validate this EKS architecture against Well-Architected best practices, output a formal validation report",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate a production-ready Terraform project for an EKS cluster with Karpenter and ArgoCD Pattern 2a",
+    "should_trigger": false
+  },
+  {
+    "query": "Add external-secrets and cert-manager addons to our EKS Terraform project with proper IRSA configuration",
+    "should_trigger": false
+  },
+  {
+    "query": "Audit our ingress controllers and score the migration off nginx to ALB.",
+    "should_trigger": false
+  },
+  {
+    "query": "We're self-hosting Llama 3 on EKS \u2014 should we run it on g6e GPU nodes or Inferentia2, and should serving be vLLM or Ray Serve?",
+    "should_trigger": false
+  },
+  {
+    "query": "We're processing PHI on EKS and need a HIPAA-ready security baseline across the whole stack \u2014 what's the AWS-recommended hardening?",
+    "should_trigger": false
+  },
+  {
+    "query": "Our PCI-DSS audit is in 4 months; what's the priority order to harden the cluster \u2014 CIS, Pod Security Admission, NetworkPolicy, GuardDuty?",
+    "should_trigger": false
+  }
 ]

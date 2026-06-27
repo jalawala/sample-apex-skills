@@ -1,25 +1,94 @@
 [
-  {"query": "Run an EKS operational review on `payment-prod` — I want a full audit across all 10 sections with prioritized actions.", "should_trigger": true},
-  {"query": "Audit my cluster's operational posture and produce a maturity score.", "should_trigger": true},
-  {"query": "EKS health check on staging-cluster, please. Walk through the standard sections and rate everything GREEN/AMBER/RED.", "should_trigger": true},
-  {"query": "Review my EKS posture — operational excellence, the whole thing — and write me a report I can share with leadership.", "should_trigger": true},
-  {"query": "Check my EKS networking — subnet IPs, CoreDNS, NetworkPolicies. Score it the way an operational review would.", "should_trigger": true},
-  {"query": "Review RBAC and IAM on my cluster — IRSA, Pod Identity, RBAC bindings, API server endpoint exposure.", "should_trigger": true},
-  {"query": "Audit observability on my cluster — control plane logs, metrics stack, alerting coverage.", "should_trigger": true},
-  {"query": "Do an operational assessment on `data-platform` and tell me what's RED.", "should_trigger": true},
-
-  {"query": "Is my cluster ready to upgrade from 1.31 to 1.32? Run a readiness assessment and give me a score.", "should_trigger": false},
-  {"query": "Score my upgrade readiness for EKS — I need to know what's blocking us before we touch the control plane.", "should_trigger": false},
-  {"query": "What version of EKS am I running and which add-ons do we have installed? Just inherited the cluster and need a discovery pass.", "should_trigger": false},
-  {"query": "Do a full reconnaissance on our EKS environment — compute strategy, IaC tooling, CI/CD, observability stack — so we know what we're working with.", "should_trigger": false},
-  {"query": "Should we use Karpenter or Managed Node Groups for our new EKS cluster? Need an architectural recommendation.", "should_trigger": false},
-  {"query": "How do I install and configure the EKS MCP server so my AI assistant can actually query the cluster?", "should_trigger": false},
-  {"query": "Walk me through actually upgrading my EKS cluster from 1.30 to 1.31 — give me the full step-by-step procedure.", "should_trigger": false},
-  {"query": "Audit my AWS account's overall security posture — IAM policies, S3 bucket settings, CloudTrail coverage.", "should_trigger": false},
-  {"query": "Analyze my EKS cluster's cost efficiency — show me dollar waste per dimension and a cost score.", "should_trigger": false},
-  {"query": "How much am I wasting on my EKS cluster? Run a cost intelligence assessment with savings projections.", "should_trigger": false},
-  {"query": "How do we measure whether our internal developer platform is healthy, and what DORA metrics should the platform team track?", "should_trigger": false},
-  {"query": "Generate a production-ready Terraform project for a new EKS cluster with Karpenter, VPC CNI, and ArgoCD bootstrap", "should_trigger": false},
-  {"query": "Create architecture decision records and Mermaid topology diagrams for our planned EKS cluster migration", "should_trigger": false},
-  {"query": "Assess how hard it is to migrate our nginx ingress to ALB and score the effort.", "should_trigger": false}
+  {
+    "query": "Run an EKS operational review on `payment-prod` \u2014 I want a full audit across all 10 sections with prioritized actions.",
+    "should_trigger": true
+  },
+  {
+    "query": "Audit my cluster's operational posture and produce a maturity score.",
+    "should_trigger": true
+  },
+  {
+    "query": "EKS health check on staging-cluster, please. Walk through the standard sections and rate everything GREEN/AMBER/RED.",
+    "should_trigger": true
+  },
+  {
+    "query": "Review my EKS posture \u2014 operational excellence, the whole thing \u2014 and write me a report I can share with leadership.",
+    "should_trigger": true
+  },
+  {
+    "query": "Check my EKS networking \u2014 subnet IPs, CoreDNS, NetworkPolicies. Score it the way an operational review would.",
+    "should_trigger": true
+  },
+  {
+    "query": "Review RBAC and IAM on my cluster \u2014 IRSA, Pod Identity, RBAC bindings, API server endpoint exposure.",
+    "should_trigger": true
+  },
+  {
+    "query": "Audit observability on my cluster \u2014 control plane logs, metrics stack, alerting coverage.",
+    "should_trigger": true
+  },
+  {
+    "query": "Do an operational assessment on `data-platform` and tell me what's RED.",
+    "should_trigger": true
+  },
+  {
+    "query": "Is my cluster ready to upgrade from 1.31 to 1.32? Run a readiness assessment and give me a score.",
+    "should_trigger": false
+  },
+  {
+    "query": "Score my upgrade readiness for EKS \u2014 I need to know what's blocking us before we touch the control plane.",
+    "should_trigger": false
+  },
+  {
+    "query": "What version of EKS am I running and which add-ons do we have installed? Just inherited the cluster and need a discovery pass.",
+    "should_trigger": false
+  },
+  {
+    "query": "Do a full reconnaissance on our EKS environment \u2014 compute strategy, IaC tooling, CI/CD, observability stack \u2014 so we know what we're working with.",
+    "should_trigger": false
+  },
+  {
+    "query": "Should we use Karpenter or Managed Node Groups for our new EKS cluster? Need an architectural recommendation.",
+    "should_trigger": false
+  },
+  {
+    "query": "How do I install and configure the EKS MCP server so my AI assistant can actually query the cluster?",
+    "should_trigger": false
+  },
+  {
+    "query": "Walk me through actually upgrading my EKS cluster from 1.30 to 1.31 \u2014 give me the full step-by-step procedure.",
+    "should_trigger": false
+  },
+  {
+    "query": "Audit my AWS account's overall security posture \u2014 IAM policies, S3 bucket settings, CloudTrail coverage.",
+    "should_trigger": false
+  },
+  {
+    "query": "Analyze my EKS cluster's cost efficiency \u2014 show me dollar waste per dimension and a cost score.",
+    "should_trigger": false
+  },
+  {
+    "query": "How much am I wasting on my EKS cluster? Run a cost intelligence assessment with savings projections.",
+    "should_trigger": false
+  },
+  {
+    "query": "How do we measure whether our internal developer platform is healthy, and what DORA metrics should the platform team track?",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate a production-ready Terraform project for a new EKS cluster with Karpenter, VPC CNI, and ArgoCD bootstrap",
+    "should_trigger": false
+  },
+  {
+    "query": "Create architecture decision records and Mermaid topology diagrams for our planned EKS cluster migration",
+    "should_trigger": false
+  },
+  {
+    "query": "Assess how hard it is to migrate our nginx ingress to ALB and score the effort.",
+    "should_trigger": false
+  },
+  {
+    "query": "Prepare our EKS cluster for a HIPAA compliance audit \u2014 what controls and evidence (Audit Manager, control-plane logs) do we need?",
+    "should_trigger": false
+  }
 ]

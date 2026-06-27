@@ -34,6 +34,7 @@ Generate architecture design documents for production-ready EKS deployments. All
 - Detailed reference material on autoscaling, networking, security, observability, cost, reliability, or upgrades (use `eks-best-practices`)
 - Internal Developer Platforms, Backstage portals, golden paths, progressive delivery, or developer self-service (use `eks-platform-engineering`)
 - GenAI / LLM workload design — GPU vs Trainium/Inferentia selection, vLLM / Ray Serve / distributed-training architecture, ML storage (FSx for Lustre), or GPU/Neuron scheduling (use `eks-genai`). Design the *cluster* here; design the *GenAI workload on it* there.
+- Security & compliance hardening for regulated workloads — CIS benchmarks, HIPAA/PCI/FedRAMP/GDPR scope, Pod Identity/Access Entries, Pod Security Admission, GuardDuty, image signing, audit logging (use `eks-security`).
 
 ## Design Output Format
 

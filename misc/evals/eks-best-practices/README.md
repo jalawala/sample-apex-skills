@@ -20,6 +20,7 @@ The 12 negative prompts in `triggering.json` (entries 9–20, 0-indexed 8–19) 
 - **`eks-build`** (EKS Terraform code generation — full project scaffold, add-ons, ArgoCD GitOps) — negatives 21, 22 ("Generate a production-ready Terraform p…").
 - **`eks-cost-intelligence`** (live cost assessment) — negatives 23, 24 ("dollar figures showing exactly how much each namespace is wasting", "scored cost efficiency report for FinOps review"). The discriminator: cost-intelligence runs a live assessment producing dollar-quantified waste and a 0–100 score; best-practices gives architectural cost recommendations and design guidance.
 - **`eks-ingress-migration`** (assesses/plans migrating off the NGINX ingress controller to Gateway API / ALB / ATX) — negative 25 ("audit ingress controllers, score migration off nginx to ALB"). Best-practices gives ingress design guidance; ingress-migration assesses an existing nginx estate and produces a migration plan.
+- **`eks-security`** (EKS security & compliance hardening — CIS, HIPAA/PCI/FedRAMP/GDPR, Pod Identity/Access Entries, PSA, GuardDuty, image signing, audit logging) — negatives 27, 28 ("We're processing PHI on EKS and need a…").
 <!-- SIBLING_MAP_END -->
 
 The key discriminators for `eks-best-practices`: the prompt asks for a *decision*, *recommendation*, *tradeoff*, or *sanity check* about an EKS design surface — not a discovery scan, not an executable upgrade runbook, and not MCP tooling setup.

@@ -1,28 +1,98 @@
 [
-  {"query": "What version is my EKS cluster prod-use1 running right now?", "should_trigger": true},
-  {"query": "I'm about to upgrade cluster foo from 1.29 to 1.30 — can you pull together everything you know about it first so I have context?", "should_trigger": true},
-  {"query": "Take a look at my EKS cluster `payments-prod` in us-east-1 and tell me what's going on in there.", "should_trigger": true},
-  {"query": "Am I using Karpenter or managed node groups on the platform cluster?", "should_trigger": true},
-  {"query": "How is cluster bar-staging managed? Is it Terraform, CDK, eksctl, something else?", "should_trigger": true},
-  {"query": "Give me an inventory of every EKS add-on and Helm release installed on cluster apex-prod.", "should_trigger": true},
-  {"query": "Document the networking and security posture of our dev cluster for the new platform engineer starting Monday.", "should_trigger": true},
-  {"query": "Before I touch anything, walk me through what's deployed in the cluster and how CI/CD gets things there.", "should_trigger": true},
-
-  {"query": "We're designing a new EKS cluster from scratch — should we go with Karpenter or Auto Mode for the compute layer?", "should_trigger": false},
-  {"query": "What's the recommended way to do tenant isolation on a shared EKS platform — separate node pools, namespaces, network policies?", "should_trigger": false},
-  {"query": "Is it a better practice to run my ingress controller on Fargate or on Karpenter-managed nodes?", "should_trigger": false},
-
-  {"query": "How do I install and configure the EKS MCP server locally so Claude can reach my clusters?", "should_trigger": false},
-
-  {"query": "Explain how Kubernetes StatefulSet rolling updates work at the controller level.", "should_trigger": false},
-  {"query": "Score my EKS cluster's upgrade readiness — are there deprecated APIs or breaking changes that would block a version bump?", "should_trigger": false},
-  {"query": "Run an operational excellence audit on my cluster and rate each area GREEN, AMBER, or RED.", "should_trigger": false},
-  {"query": "Check whether my cluster can safely upgrade to 1.33 — I want a readiness score, not just an inventory.", "should_trigger": false},
-  {"query": "Run a cost audit on my production EKS cluster and quantify the waste in dollars.", "should_trigger": false},
-  {"query": "Catalog our services in a Backstage developer portal so app teams can see what's deployed and self-serve new ones.", "should_trigger": false},
-  {"query": "Design a new EKS architecture for our healthcare platform and generate ADRs for each decision", "should_trigger": false},
-  {"query": "Create a security architecture document with Mermaid diagrams for our EKS cluster", "should_trigger": false},
-  {"query": "Generate Terraform code for a new air-gapped EKS cluster with private ECR and VPC endpoints", "should_trigger": false},
-  {"query": "Build an EKS Terraform project using Pattern 2b with ACK controllers", "should_trigger": false},
-  {"query": "Map our nginx Ingress resources to HTTPRoute and flag annotations with no Gateway API equivalent.", "should_trigger": false}
+  {
+    "query": "What version is my EKS cluster prod-use1 running right now?",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm about to upgrade cluster foo from 1.29 to 1.30 \u2014 can you pull together everything you know about it first so I have context?",
+    "should_trigger": true
+  },
+  {
+    "query": "Take a look at my EKS cluster `payments-prod` in us-east-1 and tell me what's going on in there.",
+    "should_trigger": true
+  },
+  {
+    "query": "Am I using Karpenter or managed node groups on the platform cluster?",
+    "should_trigger": true
+  },
+  {
+    "query": "How is cluster bar-staging managed? Is it Terraform, CDK, eksctl, something else?",
+    "should_trigger": true
+  },
+  {
+    "query": "Give me an inventory of every EKS add-on and Helm release installed on cluster apex-prod.",
+    "should_trigger": true
+  },
+  {
+    "query": "Document the networking and security posture of our dev cluster for the new platform engineer starting Monday.",
+    "should_trigger": true
+  },
+  {
+    "query": "Before I touch anything, walk me through what's deployed in the cluster and how CI/CD gets things there.",
+    "should_trigger": true
+  },
+  {
+    "query": "We're designing a new EKS cluster from scratch \u2014 should we go with Karpenter or Auto Mode for the compute layer?",
+    "should_trigger": false
+  },
+  {
+    "query": "What's the recommended way to do tenant isolation on a shared EKS platform \u2014 separate node pools, namespaces, network policies?",
+    "should_trigger": false
+  },
+  {
+    "query": "Is it a better practice to run my ingress controller on Fargate or on Karpenter-managed nodes?",
+    "should_trigger": false
+  },
+  {
+    "query": "How do I install and configure the EKS MCP server locally so Claude can reach my clusters?",
+    "should_trigger": false
+  },
+  {
+    "query": "Explain how Kubernetes StatefulSet rolling updates work at the controller level.",
+    "should_trigger": false
+  },
+  {
+    "query": "Score my EKS cluster's upgrade readiness \u2014 are there deprecated APIs or breaking changes that would block a version bump?",
+    "should_trigger": false
+  },
+  {
+    "query": "Run an operational excellence audit on my cluster and rate each area GREEN, AMBER, or RED.",
+    "should_trigger": false
+  },
+  {
+    "query": "Check whether my cluster can safely upgrade to 1.33 \u2014 I want a readiness score, not just an inventory.",
+    "should_trigger": false
+  },
+  {
+    "query": "Run a cost audit on my production EKS cluster and quantify the waste in dollars.",
+    "should_trigger": false
+  },
+  {
+    "query": "Catalog our services in a Backstage developer portal so app teams can see what's deployed and self-serve new ones.",
+    "should_trigger": false
+  },
+  {
+    "query": "Design a new EKS architecture for our healthcare platform and generate ADRs for each decision",
+    "should_trigger": false
+  },
+  {
+    "query": "Create a security architecture document with Mermaid diagrams for our EKS cluster",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate Terraform code for a new air-gapped EKS cluster with private ECR and VPC endpoints",
+    "should_trigger": false
+  },
+  {
+    "query": "Build an EKS Terraform project using Pattern 2b with ACK controllers",
+    "should_trigger": false
+  },
+  {
+    "query": "Map our nginx Ingress resources to HTTPRoute and flag annotations with no Gateway API equivalent.",
+    "should_trigger": false
+  },
+  {
+    "query": "Harden my EKS cluster to meet PCI-DSS \u2014 give me the prioritized control list and 30/60/90 remediation plan.",
+    "should_trigger": false
+  }
 ]

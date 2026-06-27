@@ -31,6 +31,7 @@ Read the user's request and match it to the appropriate workflow:
 | "Run an EKS operational review" / "Audit my cluster" / "EKS health check" / "Review my EKS posture" | → [Operational Review](workflows/eks-operation-review.md) | Day 2 |
 | "Check my EKS networking" / "Review RBAC on my cluster" / "Audit observability on my cluster" | → [Operational Review](workflows/eks-operation-review.md) (section-scoped) | Day 2 |
 | "Assess my ingress" / "migrate off nginx ingress" / "move to Gateway API or ALB" / "ingress controller audit" / "how hard is it to leave nginx?" | → use the `eks-ingress-migration` skill | Day 2 |
+| "Harden my cluster" / "HIPAA / PCI / FedRAMP / GDPR on EKS" / "CIS benchmark" / "compliance audit prep" / "Pod Identity vs IRSA" / "GuardDuty / image signing / Pod Security Admission" | → [Security & Compliance](workflows/eks-security.md) | Day 1/2 |
 
 **If the request doesn't match a workflow**, use the `eks-best-practices` skill directly to answer the question. Ask clarifying questions if needed.
 
@@ -75,6 +76,7 @@ When routing between workflows, carry forward any known context. This is critica
 | **GenAI on EKS** | [workflows/eks-genai.md](workflows/eks-genai.md) | ✅ Complete | Build/serve GenAI & LLM workloads — GPU vs Neuron, Karpenter, vLLM/Ray, distributed training, ML storage, observability, AI gateway |
 | **Upgrade-Readiness Assessment** | [workflows/eks-upgrade-check.md](workflows/eks-upgrade-check.md) | ✅ Complete | Pre-upgrade readiness scoring and remediation report (vendored skill) |
 | **Operational Review** | [workflows/eks-operation-review.md](workflows/eks-operation-review.md) | ✅ Complete | 10-section operational excellence audit with GREEN/AMBER/RED ratings (vendored skill) |
+| **Security & Compliance** | [workflows/eks-security.md](workflows/eks-security.md) | ✅ Complete | Discovery-driven 7-layer hardening + compliance-regime scope (HIPAA/PCI/FedRAMP/GDPR) + 30/60/90 audit-prep roadmap |
 
 ---
 
