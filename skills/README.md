@@ -318,7 +318,20 @@ Assess EKS cluster upgrade readiness — run automated checks across 8 areas (ve
 
 ## ECS Skills
 
-_(coming soon)_
+### [ecs-architect](./ecs-architect/)
+
+Use when choosing and architecting an Amazon ECS deployment model for a NEW workload — Fargate vs ECS on EC2 vs Managed Instances vs Express Mode vs ECS Anywhere/External — plus capacity-provider strategy, task sizing, awsvpc/ENI density, networking, service parameters, and launch-type or topology migration (EC2 launch type to capacity providers/Managed Instances; Service Discovery to Service Connect). Also the shared ECS best-practices corpus. Triggers include "which ECS launch type", "Fargate or EC2", "should I use Managed Instances", "ECS capacity provider strategy", "how to size ECS tasks", "migrate off EC2 launch type", "App Mesh to Service Connect", "ECS on-prem". Skip for existing-app replatform (ecs-modernize); auditing a live estate (ecs-operation-review); cost/TCO (ecs-cost-intelligence); inventory (ecs-recon); security (ecs-security); deployment/CICD (ecs-devops); observability (ecs-observability); GPU/ML design AND GPU launch-type choice (ecs-genai); Kubernetes/EKS (eks-design).
+
+**References** (loaded on demand):
+
+| Reference | Description |
+|-----------|-------------|
+| [architecture-design.md](./ecs-architect/references/architecture-design.md) | Architecture design |
+| [best-practices-corpus.md](./ecs-architect/references/best-practices-corpus.md) | Best practices corpus |
+| [capacity-and-scaling.md](./ecs-architect/references/capacity-and-scaling.md) | Capacity and scaling |
+| [launch-type-migration.md](./ecs-architect/references/launch-type-migration.md) | Launch type migration |
+| [model-selection-framework.md](./ecs-architect/references/model-selection-framework.md) | Model selection framework |
+| [networking-and-eni-density.md](./ecs-architect/references/networking-and-eni-density.md) | Networking and eni density |
 
 ## General
 
