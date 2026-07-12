@@ -41,6 +41,11 @@
 # Fix: `./misc/update-pages.sh && git add … && commit`.
 
 set -euo pipefail
+# Command substitutions must inherit errexit: parse_frontmatter exits 2 on
+# invalid YAML, and most callers run inside $(...) (derive_title, the index
+# builders). Without this, a broken SKILL.md would be swallowed and the
+# wrapper written with an empty description.
+shopt -s inherit_errexit
 
 MODE="run"
 if [[ "${1:-}" == "--check" ]]; then
@@ -51,6 +56,11 @@ fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
+
+python3 -c 'import yaml' 2>/dev/null || {
+  echo "ERROR: PyYAML is required (pip install pyyaml)" >&2
+  exit 1
+}
 
 SKILLS_OUT="$REPO_ROOT/misc/website/docs/skills"
 STEERING_OUT="$REPO_ROOT/misc/website/docs/steering"
@@ -79,17 +89,37 @@ TOUCHED_PATHS=(
 parse_frontmatter() {
   local file="$1"
   local key="$2"
-  awk -v key="$key" '
-    /^---$/ { block++; next }
-    block == 1 && $0 ~ "^" key ":" {
-      sub("^" key ":[ ]*", "")
-      sub("^\"", ""); sub("\"$", "")
-      sub("^'\''", ""); sub("'\''$", "")
-      print
-      exit
-    }
-    block >= 2 { exit }
-  ' "$file"
+  python3 - "$file" "$key" <<'PY'
+import sys, yaml
+path, key = sys.argv[1], sys.argv[2]
+try:
+    with open(path, encoding="utf-8") as f:
+        lines = f.readlines()
+except (OSError, UnicodeDecodeError) as e:
+    print(f"ERROR: {path}: {e}", file=sys.stderr)
+    sys.exit(2)
+if not lines or lines[0].rstrip() != "---":
+    sys.exit(0)
+fm = []
+for line in lines[1:]:
+    if line.rstrip() == "---":
+        break
+    fm.append(line)
+else:
+    print(f"ERROR: {path}: unclosed frontmatter block (missing closing '---')", file=sys.stderr)
+    sys.exit(2)
+try:
+    data = yaml.safe_load("".join(fm))
+except yaml.YAMLError as e:
+    print(f"ERROR: {path}: {e}", file=sys.stderr)
+    sys.exit(2)
+if not isinstance(data, dict):
+    sys.exit(0)
+val = data.get(key)
+if val is None:
+    sys.exit(0)
+print(" ".join(str(val).split()))
+PY
 }
 
 # --- Extract first # heading from a markdown file -------------------------
@@ -289,9 +319,9 @@ vendored_skill_admonition() {
   # Fallback: frontmatter metadata
   if [[ -z "$author" ]]; then
     local skill_md="$skill_dir/SKILL.md"
-    author="$(awk '/author:/{sub(/.*author: */, ""); print; exit}' "$skill_md" 2>/dev/null)"
+    author="$(parse_frontmatter "$skill_md" "author")"
   fi
-  license_id="$(parse_frontmatter "$skill_dir/SKILL.md" "license" 2>/dev/null)"
+  license_id="$(parse_frontmatter "$skill_dir/SKILL.md" "license")"
   [[ -z "$license_id" ]] && license_id="Apache-2.0"
   [[ -z "$source_url" ]] && source_url="$GH_BASE/skills/$skill_name"
   [[ -z "$author" ]] && author="third party"
@@ -500,30 +530,29 @@ _emit_skills_index_grid() {
 # --- Build skills.json manifest to stdout ---------------------------------
 build_manifest() {
   python3 - "$SKILLS_DIR" <<'PY'
-import json, os, re, sys
+import json, os, sys
+import yaml
 
 skills_dir = sys.argv[1]
 
 
 def parse_fm(path):
     with open(path, encoding="utf-8") as f:
-        lines = f.read().splitlines()
-    if not lines or lines[0].strip() != "---":
+        lines = f.readlines()
+    if not lines or lines[0].rstrip() != "---":
         return {}
-    fm = {}
+    fm_lines = []
     for line in lines[1:]:
-        if line.strip() == "---":
+        if line.rstrip() == "---":
             break
-        m = re.match(r'^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$', line)
-        if not m:
-            continue
-        k, v = m.group(1), m.group(2).strip()
-        if (v.startswith('"') and v.endswith('"')) or (
-            v.startswith("'") and v.endswith("'")
-        ):
-            v = v[1:-1]
-        fm[k] = v
-    return fm
+        fm_lines.append(line)
+    else:
+        print(f"ERROR: {path}: unclosed frontmatter block (missing closing '---')", file=sys.stderr)
+        sys.exit(2)
+    data = yaml.safe_load("".join(fm_lines))
+    if not isinstance(data, dict):
+        return {}
+    return {k: str(v) for k, v in data.items() if v is not None}
 
 
 out = []
@@ -532,7 +561,11 @@ for entry in sorted(os.listdir(skills_dir)):
     sm = os.path.join(sd, "SKILL.md")
     if not os.path.isfile(sm):
         continue
-    fm = parse_fm(sm)
+    try:
+        fm = parse_fm(sm)
+    except Exception as e:
+        print(f"ERROR: {sm}: {e}", file=sys.stderr)
+        sys.exit(1)
     name = fm.get("name") or entry
     # Classify by prefix
     if entry.startswith("eks-"):
@@ -652,30 +685,29 @@ EOF
 # --- Build examples.json manifest to stdout --------------------------------
 build_examples_manifest() {
   python3 - "$EXAMPLES_DIR" <<'PY'
-import json, os, re, sys
+import json, os, sys
+import yaml
 
 examples_dir = sys.argv[1]
 
 
 def parse_fm(path):
     with open(path, encoding="utf-8") as f:
-        lines = f.read().splitlines()
-    if not lines or lines[0].strip() != "---":
+        lines = f.readlines()
+    if not lines or lines[0].rstrip() != "---":
         return {}
-    fm = {}
+    fm_lines = []
     for line in lines[1:]:
-        if line.strip() == "---":
+        if line.rstrip() == "---":
             break
-        m = re.match(r'^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$', line)
-        if not m:
-            continue
-        k, v = m.group(1), m.group(2).strip()
-        if (v.startswith('"') and v.endswith('"')) or (
-            v.startswith("'") and v.endswith("'")
-        ):
-            v = v[1:-1]
-        fm[k] = v
-    return fm
+        fm_lines.append(line)
+    else:
+        print(f"ERROR: {path}: unclosed frontmatter block (missing closing '---')", file=sys.stderr)
+        sys.exit(2)
+    data = yaml.safe_load("".join(fm_lines))
+    if not isinstance(data, dict):
+        return {}
+    return {k: str(v) for k, v in data.items() if v is not None}
 
 
 out = []
@@ -684,7 +716,11 @@ for root, dirs, files in sorted(os.walk(examples_dir)):
     if "README.md" not in files:
         continue
     readme_path = os.path.join(root, "README.md")
-    fm = parse_fm(readme_path)
+    try:
+        fm = parse_fm(readme_path)
+    except Exception as e:
+        print(f"ERROR: {readme_path}: {e}", file=sys.stderr)
+        sys.exit(1)
     name = fm.get("name")
     if not name:
         continue
@@ -768,7 +804,7 @@ done
 # --- Skills index (card grid) ---
 if [[ "$MODE" == "dry-run" ]]; then
   echo "--- $SKILLS_OUT/index.md ---"
-  build_skills_index | head -20
+  build_skills_index | head -20 || true
   echo "  [... truncated ...]"
   echo ""
 else
@@ -796,7 +832,8 @@ fi
 # --- Examples index (card grid) ---
 if [[ "$MODE" == "dry-run" ]]; then
   echo "--- $EXAMPLES_OUT/index.md ---"
-  build_examples_index | head -20
+  examples_index_out="$(build_examples_index)"
+  head -20 <<<"$examples_index_out"
   echo "  [... truncated ...]"
   echo ""
 else
@@ -856,7 +893,8 @@ INDEXEOF
 
 if [[ "$MODE" == "dry-run" ]]; then
   echo "--- $DEVOPS_OUT/index.md ---"
-  build_devops_index | head -20
+  devops_index_out="$(build_devops_index)"
+  head -20 <<<"$devops_index_out"
   echo "  [... truncated ...]"
   echo ""
 else
