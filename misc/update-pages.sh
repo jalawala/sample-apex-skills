@@ -90,7 +90,7 @@ parse_frontmatter() {
   local file="$1"
   local key="$2"
   python3 - "$file" "$key" <<'PY'
-import sys, yaml
+import os, sys, yaml
 path, key = sys.argv[1], sys.argv[2]
 try:
     with open(path, encoding="utf-8") as f:
@@ -107,6 +107,9 @@ for line in lines[1:]:
     fm.append(line)
 else:
     print(f"ERROR: {path}: unclosed frontmatter block (missing closing '---')", file=sys.stderr)
+    sys.exit(2)
+if len("".join(fm).encode("utf-8")) > 64 * 1024:
+    print(f"ERROR: {path}: frontmatter block too large to parse", file=sys.stderr)
     sys.exit(2)
 try:
     data = yaml.safe_load("".join(fm))
@@ -307,12 +310,15 @@ vendored_skill_admonition() {
   local notices="$REPO_ROOT/THIRD_PARTY_NOTICES.md"
   local author license_id source_url
   if [[ -f "$notices" ]]; then
-    source_url="$(awk -v name="$skill_name" '
-      $0 ~ "^## " name { found=1; next }
+    # Pass skill_name via ENVIRON (not -v, which escape-processes the value)
+    # and match with index()==1 (literal prefix) rather than a regex, so a
+    # name containing regex metacharacters cannot match the wrong section.
+    source_url="$(SKILL_NAME="$skill_name" awk '
+      index($0, "## " ENVIRON["SKILL_NAME"]) == 1 { found=1; next }
       found && /Source:/ { sub(/.*Source:[* ]*/, ""); sub(/[* ]*$/, ""); print; exit }
     ' "$notices")"
-    author="$(awk -v name="$skill_name" '
-      $0 ~ "^## " name { found=1; next }
+    author="$(SKILL_NAME="$skill_name" awk '
+      index($0, "## " ENVIRON["SKILL_NAME"]) == 1 { found=1; next }
       found && /Copyright:/ { sub(/.*Copyright:[* ]*/, ""); sub(/[* ]*$/, ""); print; exit }
     ' "$notices")"
   fi
@@ -549,6 +555,9 @@ def parse_fm(path):
     else:
         print(f"ERROR: {path}: unclosed frontmatter block (missing closing '---')", file=sys.stderr)
         sys.exit(2)
+    if len("".join(fm_lines).encode("utf-8")) > 64 * 1024:
+        print(f"ERROR: {path}: frontmatter block too large to parse", file=sys.stderr)
+        sys.exit(2)
     data = yaml.safe_load("".join(fm_lines))
     if not isinstance(data, dict):
         return {}
@@ -679,7 +688,7 @@ EOF
     echo ""
     echo "$description"
     echo ""
-  done < <(find "$EXAMPLES_DIR" -name 'README.md' -print0 | sort -z)
+  done < <(find "$EXAMPLES_DIR" -type d -name '.terraform' -prune -o -type d -name '.*' -prune -o -name 'README.md' -print0 | sort -z)
 }
 
 # --- Build examples.json manifest to stdout --------------------------------
@@ -704,6 +713,9 @@ def parse_fm(path):
     else:
         print(f"ERROR: {path}: unclosed frontmatter block (missing closing '---')", file=sys.stderr)
         sys.exit(2)
+    if len("".join(fm_lines).encode("utf-8")) > 64 * 1024:
+        print(f"ERROR: {path}: frontmatter block too large to parse", file=sys.stderr)
+        sys.exit(2)
     data = yaml.safe_load("".join(fm_lines))
     if not isinstance(data, dict):
         return {}
@@ -712,6 +724,9 @@ def parse_fm(path):
 
 out = []
 for root, dirs, files in sorted(os.walk(examples_dir)):
+    # Prune gitignored/hidden trees (e.g. examples/**/.terraform) so a large
+    # no-frontmatter README under them never aborts the generator.
+    dirs[:] = [d for d in dirs if d != ".terraform" and not d.startswith(".")]
     dirs.sort()
     if "README.md" not in files:
         continue
