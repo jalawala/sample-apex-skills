@@ -499,7 +499,7 @@ networking:
 
 `DescribeTargetGroups` returns an empty `LoadBalancerArns` list in two common scenarios:
 
-1. **ECS-native blue/green deployments** — the target groups attach to the load balancer via listener rules managed by the ECS deployment controller (returned in `loadBalancers[].advancedConfiguration`), not via direct association.
+1. **ECS-native blue/green deployments** — the target groups attach to the load balancer via listener rules (ALB) or listeners (NLB) managed by the ECS deployment controller (returned in `loadBalancers[].advancedConfiguration`), not via direct association.
 2. **Orphaned target groups** — the target group was detached from its load balancer or never attached.
 
 In both cases the `DescribeTargetGroups` → `DescribeLoadBalancers` path cannot determine the LB type.
