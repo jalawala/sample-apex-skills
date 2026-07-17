@@ -191,6 +191,8 @@ aws ecs describe-clusters --clusters prod-api staging-web batch-processing --inc
 }
 ```
 
+> Facts verified 2026-07-17 against https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeClusters.html — `DescribeClusters` accepts up to 100 cluster names per call.
+
 **Batch limits:** `DescribeClusters` accepts up to 100 cluster names per call. If you have more than 100 clusters, batch them into groups of 100.
 
 **Interpretation:**

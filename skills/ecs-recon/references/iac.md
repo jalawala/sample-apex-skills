@@ -43,7 +43,7 @@ Run detections in this order — each step adds evidence and confidence:
 ```
 
 **Why this order matters:**
-- Tags are the strongest single-call signal for the tools that DO tag: CloudFormation always applies `aws:cloudformation:*` tags, CDK adds `aws:cdk:path` (when metadata is enabled), and Copilot adds `copilot-*` tags
+- Tags are the strongest single-call signal for the tools that DO tag: CloudFormation always applies `aws:cloudformation:*` tags (CDK and Copilot deploy through CloudFormation, so their resources carry them too), some CDK constructs emit `aws-cdk:*` tags (e.g. `aws-cdk:auto-delete-objects`), and Copilot adds `copilot-*` tags. Note: CDK's construct path (`aws:cdk:path`) is recorded in the CloudFormation template `Metadata` attribute, NOT as a resource tag — the `aws:` tag prefix is reserved for AWS services, so nothing can apply it as a tag. CDK detection relies on `aws-cdk:*` tags, `aws:cloudformation:*` tags plus stack association, and CDK-pattern logical IDs/metadata resources
 - **Terraform is the critical exception: Terraform applies NO default tags.** Unless the team configured `default_tags` on the AWS provider or tagged resources explicitly, a fully Terraform-managed estate is invisible to tag-based detection. Expect `undetermined: true` to frequently mean "Terraform or console-managed" — do not read it as "no IaC"
 - Stack association confirms CloudFormation-family tools (CDK, Copilot, raw CloudFormation) with high confidence
 - Naming patterns provide supporting evidence when tags are stripped or absent, but carry lower confidence alone
@@ -95,12 +95,12 @@ aws ecs list-tags-for-resource \
 {
   "tags": [
     {
-      "key": "aws:cdk:path",
-      "value": "MyStack/MyService/Service"
-    },
-    {
       "key": "aws-cdk:auto-delete-objects",
       "value": "true"
+    },
+    {
+      "key": "aws:cloudformation:stack-name",
+      "value": "CdkEcsStack"
     }
   ]
 }
@@ -164,14 +164,13 @@ aws ecs list-tags-for-resource \
 
 **Tag patterns to match:**
 
-> Facts verified 2026-07-14 against https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-resource-tags.html — CloudFormation automatically applies the stack-level tags `aws:cloudformation:logical-id`, `aws:cloudformation:stack-id`, and `aws:cloudformation:stack-name` (the `aws:` prefix is reserved for AWS use). Terraform's AWS provider applies NO tags by default — `terraform:*` / `tf-*` keys only exist when a team configured them deliberately.
+> Facts verified 2026-07-14 against https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-resource-tags.html — CloudFormation automatically applies the stack-level tags `aws:cloudformation:logical-id`, `aws:cloudformation:stack-id`, and `aws:cloudformation:stack-name` (the `aws:` prefix is reserved for AWS use). Terraform's AWS provider applies NO tags by default — `terraform:*` / `tf-*` keys only exist when a team configured them deliberately. CDK's `aws:cdk:path` construct path lands in the template `Metadata` attribute, not in resource tags — do not look for it as a tag.
 
 | Tool | Tag Key Pattern | Confidence | Origin |
 |------|----------------|------------|--------|
 | Terraform | Key starts with `terraform:` | High | Team convention (Terraform emits no default tags) |
 | Terraform | Key starts with `tf-` | High | Team convention (Terraform emits no default tags) |
-| CDK | Key is `aws:cdk:path` | High | Tool-emitted (when CDK path metadata is enabled) |
-| CDK | Key starts with `aws-cdk:` | High | Tool-emitted (specific constructs) |
+| CDK | Key starts with `aws-cdk:` (e.g. `aws-cdk:auto-delete-objects`) | High | Tool-emitted (specific constructs) |
 | Copilot | Key is `copilot-application` | High | Tool-emitted |
 | Copilot | Key is `copilot-environment` | High | Tool-emitted |
 | Copilot | Key is `copilot-service` | High | Tool-emitted |
@@ -342,8 +341,7 @@ If evidence IS found for one or more tools:
 |----------------|-----------|-------------|
 | Tag: `terraform:*` prefix | Terraform state management tags | `terraform` |
 | Tag: `tf-*` prefix | Terraform workspace/module tags | `terraform` |
-| Tag: `aws:cdk:path` | CDK construct path tag | `cdk` |
-| Tag: `aws-cdk:*` prefix | CDK metadata tags | `cdk` |
+| Tag: `aws-cdk:*` prefix | CDK construct-emitted tags | `cdk` |
 | Tag: `copilot-application` | Copilot application tag | `copilot` |
 | Tag: `copilot-environment` | Copilot environment tag | `copilot` |
 | Tag: `copilot-service` | Copilot service tag | `copilot` |
@@ -400,9 +398,9 @@ iac:
       confidence: "high"
       evidence:
         - type: "resource_tags"
-          detail: "Tag 'aws:cdk:path' found on service 'api-service' with value 'MyStack/ApiService/Service'"
+          detail: "Tag 'aws-cdk:auto-delete-objects' found on service 'api-service'"
         - type: "stack_association"
-          detail: "Service belongs to CloudFormation stack 'CdkEcsStack' with CDK-pattern naming"
+          detail: "Service belongs to CloudFormation stack 'CdkEcsStack' with CDK-pattern logical IDs"
     - tool: "terraform"
       confidence: "high"
       evidence:
@@ -523,7 +521,7 @@ Only three evidence types are valid: `"resource_tags"`, `"stack_association"`, a
 Both CDK and Copilot deploy resources via CloudFormation, so their resources will have `aws:cloudformation:*` tags in addition to their own tool-specific tags. This creates overlapping evidence.
 
 **How to handle:**
-- If CDK-specific tags (`aws:cdk:path`, `aws-cdk:*`) are present alongside `aws:cloudformation:*` tags → report `"cdk"` (not `"cloudformation"`)
+- If CDK-specific tags (`aws-cdk:*`, e.g. `aws-cdk:auto-delete-objects`) are present alongside `aws:cloudformation:*` tags, or the owning stack shows CDK-pattern logical IDs or CDK metadata resources → report `"cdk"` (not `"cloudformation"`)
 - If Copilot-specific tags (`copilot-application`, `copilot-environment`, `copilot-service`) are present alongside `aws:cloudformation:*` tags → report `"copilot"` (not `"cloudformation"`)
 - Report `"cloudformation"` only when `aws:cloudformation:*` tags are present WITHOUT CDK or Copilot-specific tags
 - Priority: Copilot tags > CDK tags > plain CloudFormation tags (most specific tool wins)
@@ -536,9 +534,9 @@ iac:
       confidence: "high"
       evidence:
         - type: "resource_tags"
-          detail: "Tag 'aws:cdk:path' found on service with value 'MyStack/Service/Resource'"
+          detail: "Tag 'aws-cdk:auto-delete-objects' found on service alongside 'aws:cloudformation:*' tags"
         - type: "stack_association"
-          detail: "Service belongs to stack 'CdkEcsStack' (CDK-generated)"
+          detail: "Service belongs to stack 'CdkEcsStack' (CDK-pattern logical IDs)"
   undetermined: false
   error: null
 ```
