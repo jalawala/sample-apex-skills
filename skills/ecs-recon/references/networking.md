@@ -151,7 +151,9 @@ aws ecs describe-services \
 ]
 ```
 
-**Note on ECS-native blue/green services:** When the service uses ECS-native blue/green deployment (`deploymentConfiguration.strategy: BLUE_GREEN`), the `loadBalancers` entry may also include `advancedConfiguration` with `productionListenerRule`, `testListenerRule`, `alternateTargetGroupArn`, and `roleArn`. If `DescribeTargetGroups` returns empty `LoadBalancerArns` for such a service, extract the load balancer ARN from the listener-rule ARN (`arn:...:listener-rule/<lb-arn-segment>/...`) or fall back to `type: "unknown"`. See [Target group with empty LoadBalancerArns](#target-group-with-empty-loadbalancerarns).
+**Note on ECS-native blue/green services:** When the service uses ECS-native blue/green deployment (`deploymentConfiguration.strategy: BLUE_GREEN`), the `loadBalancers` entry may also include `advancedConfiguration` with `productionListenerRule`, `testListenerRule`, `alternateTargetGroupArn`, and `roleArn`. Despite the field name, `productionListenerRule` holds a listener-**rule** ARN for an Application Load Balancer but a plain **listener** ARN for a Network Load Balancer. If `DescribeTargetGroups` returns empty `LoadBalancerArns` for such a service, derive the load balancer ARN from that ARN (both shapes) or fall back to `type: "unknown"`. See [Target group with empty LoadBalancerArns](#target-group-with-empty-loadbalancerarns).
+
+> Facts verified 2026-07-17 against https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_AdvancedConfiguration.html — `productionListenerRule` / `testListenerRule` identify "the production listener rule (in the case of an Application Load Balancer) or listener (in the case for an Network Load Balancer)".
 
 **Step 3b: Describe target group to get load balancer ARNs**
 
@@ -497,14 +499,17 @@ networking:
 
 `DescribeTargetGroups` returns an empty `LoadBalancerArns` list in two common scenarios:
 
-1. **ECS-native blue/green deployments** — the target groups attach to the load balancer via listener rules managed by the ECS deployment controller (returned in `loadBalancers[].advancedConfiguration`), not via direct association.
+1. **ECS-native blue/green deployments** — the target groups attach to the load balancer via listener rules (ALB) or listeners (NLB) managed by the ECS deployment controller (returned in `loadBalancers[].advancedConfiguration`), not via direct association.
 2. **Orphaned target groups** — the target group was detached from its load balancer or never attached.
 
 In both cases the `DescribeTargetGroups` → `DescribeLoadBalancers` path cannot determine the LB type.
 
+> Facts verified 2026-07-17 against https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_AdvancedConfiguration.html — `productionListenerRule` identifies a listener rule for an Application Load Balancer but a listener for a Network Load Balancer.
+
 **How to handle:**
-- If `LoadBalancerArns` is empty, check whether the service uses `advancedConfiguration` (present on ECS-native blue/green services). If `advancedConfiguration.productionListenerRule` exists, derive the load balancer ARN from the listener-rule ARN and resolve the type with `DescribeLoadBalancers`.
-- **ARN derivation:** a listener-rule ARN has the form `arn:aws:elasticloadbalancing:<region>:<account>:listener-rule/<lb-type>/<lb-name>/<lb-id>/<listener-id>/<rule-id>`. Replace the `listener-rule` resource token with `loadbalancer` and keep only the first three path segments: `arn:aws:elasticloadbalancing:<region>:<account>:loadbalancer/<lb-type>/<lb-name>/<lb-id>`.
+- If `LoadBalancerArns` is empty, check whether the service uses `advancedConfiguration` (present on ECS-native blue/green services). If `advancedConfiguration.productionListenerRule` exists, derive the load balancer ARN from it and resolve the type with `DescribeLoadBalancers`. Per the API reference, this field holds a listener-**rule** ARN for an ALB but a plain **listener** ARN for an NLB — branch on the ARN's resource token:
+- **ARN derivation (`listener-rule` token — ALB):** a listener-rule ARN has the form `arn:aws:elasticloadbalancing:<region>:<account>:listener-rule/<lb-type>/<lb-name>/<lb-id>/<listener-id>/<rule-id>`. Replace the `listener-rule` resource token with `loadbalancer` and keep only the first three path segments: `arn:aws:elasticloadbalancing:<region>:<account>:loadbalancer/<lb-type>/<lb-name>/<lb-id>`.
+- **ARN derivation (`listener` token — NLB):** a listener ARN has the form `arn:aws:elasticloadbalancing:<region>:<account>:listener/<lb-type>/<lb-name>/<lb-id>/<listener-id>` (no rule segment, `<lb-type>` is `net`). Replace the `listener` resource token with `loadbalancer` and keep only the first three path segments: `arn:aws:elasticloadbalancing:<region>:<account>:loadbalancer/net/<lb-name>/<lb-id>`.
 - If `DescribeLoadBalancers` on the derived ARN returns `LoadBalancerNotFound`, the reference is stale (the load balancer was deleted after the service's last deployment) — set `type` to `"unknown"` and note the stale reference in the service's `error` field.
 - If `advancedConfiguration` is absent or the derivation is impractical, set `type` to `"unknown"`.
 - Always report the entry with the target group ARN, container name, and port regardless.
@@ -535,3 +540,4 @@ load_balancers:
 - Service Connect (configuration lives on the deployment): https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html
 - Service discovery (`serviceRegistries`): https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html
 - AWS App Mesh overview and end-of-support announcement (2026-09-30): https://docs.aws.amazon.com/app-mesh/latest/userguide/what-is-app-mesh.html
+- Blue/green `advancedConfiguration` fields (`productionListenerRule` is a listener rule for ALB, a listener for NLB): https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_AdvancedConfiguration.html

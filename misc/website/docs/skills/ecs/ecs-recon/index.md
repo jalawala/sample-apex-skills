@@ -97,7 +97,7 @@ Load only the references needed for the user's request — this keeps context fo
 
 | Module | Intent / When to Use | Reference File |
 |--------|---------------------|----------------|
-| Overview | Always loaded first — account-wide inventory of clusters, services, tasks | [overview.md](references/overview) |
+| Overview | Always loaded first — account-wide inventory of clusters, services, and their tasks (standalone/scheduled tasks not discovered) | [overview.md](references/overview) |
 | Compute | Capacity providers, launch types, task counts, Fargate vs EC2 | [compute.md](references/compute) |
 | Task Definitions | Container images, CPU/memory, family and revision | [task-definitions.md](references/task-definitions) |
 | Deployment | Rolling update, CodeDeploy, circuit breaker, min/max percent | [deployment.md](references/deployment) |
